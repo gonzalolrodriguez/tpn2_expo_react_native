@@ -2,6 +2,8 @@
 
 ## Expo Router: rutas, navegación, pilas y colas
 
+**Alumno:** Rodriguez, Gonzalo
+
 ---
 
 ## Parte A · Estructuras de datos: la pila y la cola
@@ -513,11 +515,11 @@ Permite centralizar el control de accesos en el layout principal en lugar de rep
 
 ### F3. 404, anchor y rutas tipadas
 
-**a) `+not-found.tsx`:** Es la pantalla predeterminada de error 404 que se muestra automáticamente cuando se entra a una ruta desconocida.
+**a) `+not-found.tsx`:** Es la pantalla predeterminada de error 404 que se muestra automáticamente cuando se entra a una ruta desconocida. Se define como un archivo con ese nombre exacto en la raíz de la carpeta de rutas: `src/app/+not-found.tsx`.
 
-**b) `export const unstable_settings = { anchor: "(tabs)" }`:** Se coloca en el layout para establecer la ruta base o "ancla" cuando se entra mediante un deep link directo, garantizando que las pestañas `(tabs)` queden cargadas debajo en el historial.
+**b) `export const unstable_settings = { anchor: "(tabs)" }`:** Se exporta desde el layout raíz, `src/app/_layout.tsx`. Establece la ruta base o "ancla" cuando se entra mediante un deep link directo, garantizando que las pestañas `(tabs)` queden cargadas debajo en el historial.
 
-**c) `typedRoutes`:** Si habilitamos rutas tipadas y escribimos `<Link href="/prodcutos" />` con un error de tipeo, TypeScript marcará un error de compilación. Los tipos válidos se generan automáticamente en la carpeta `.expo/types/`.
+**c) `typedRoutes`:** Se habilita en `app.json`, dentro de `expo.experiments` (`"typedRoutes": true`). Si escribimos `<Link href="/prodcutos" />` con un error de tipeo, TypeScript marcará un error de compilación porque esa ruta no existe. Los tipos válidos se generan automáticamente en la carpeta `.expo/types/` al correr `npx expo start`.
 
 ---
 

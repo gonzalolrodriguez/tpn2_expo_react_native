@@ -1,5 +1,7 @@
 # Comedor IPF 🍽️ - App de Pedidos
 
+**Alumno:** Rodriguez, Gonzalo
+
 Aplicación móvil desarrollada con **React Native**, **Expo Router (SDK 57)** y **TypeScript** para el Comedor del Instituto Politécnico Formosa.
 
 El sistema combina dos estructuras de datos desarrolladas a medida:
@@ -50,14 +52,21 @@ src/
 │    FilaDato, Campo, Chip, NotaCocina, EstadoVacio, ImagenPlato, RejillaPlatos, TarjetaFoto, Carrusel,
 │    HeroMarca, Marca, BotonAgregar, BarraCarrito, TicketTurno, Movimiento y Diseno)
 ├── tema/
-│   └── tokens.ts                       -> Sistema de diseño: colores, espaciado, tipografía, radios y sombras
+│   └── tokens.ts                       -> Sistema de diseño: colores, espaciado, tipografía, radios, sombras,
+│                                          animaciones (movimiento), puntos de quiebre (diseno) y formatoPrecio()
 ├── context/
 │   └── ComedorContext.tsx              -> Contexto global (sesión, carrito, Pila de deshacer, Cola de pedidos)
 ├── data/
 │   └── platos.ts                       -> 12 platos de ejemplo distribuidos en 4 categorías
 └── estructuras/
-    ├── Pila.ts                         -> Clase Pila con #items privada, tamanio y aArray()
-    └── Cola.ts                         -> Clase Cola con #items e #frente privada (sin shift), tamanio y aArray()
+    ├── Pila.ts                         -> Clase Pila con #items privada, tamanio, aArray() y limpiar()
+    └── Cola.ts                         -> Clase Cola con #items e #frente privada (sin shift), tamanio, aArray() y limpiar()
+
+assets/
+├── escudo-ipf.png, logo-ipf.png        -> Escudo y logo del instituto
+├── icon.png, adaptive-icon.png,
+│   splash.png, favicon.png             -> Ícono, pantalla de inicio y favicon de la app
+└── platos/                             -> Una foto por plato (12) y CREDITOS.md con autor y licencia
 ```
 
 ### Navegador de cada `_layout`:
@@ -65,7 +74,7 @@ src/
 2. `src/app/(tabs)/_layout.tsx`: **Tabs** (importadas desde `expo-router/js-tabs`). Muestra la barra de pestañas inferior para **Inicio**, **Menú** y **Carrito** (con `tabBarBadge`). Con sesión iniciada aparece además la pestaña **Cocina**, envuelta en `Tabs.Protected`.
 3. `src/app/(tabs)/menu/_layout.tsx`: **Stack**. Permite navegar de `/menu` a `/menu/[id]` manteniendo visible la barra de pestañas.
 4. `src/app/(tabs)/carrito/_layout.tsx`: **Stack**. Permite desplegar la hoja inferior `/carrito/nota` con `presentation: "formSheet"` y `sheetAllowedDetents: [0.5, 0.9]`.
-5. `src/app/cocina/_layout.tsx`: **Drawer**. Menú lateral desplegable para alternar entre "Pedidos Activos" (`/cocina`) e "Historial Atendidos" (`/cocina/atendidos`).
+5. `src/app/cocina/_layout.tsx`: **Drawer**. Menú lateral desplegable para alternar entre "Pedidos en cola" (`/cocina`) y "Pedidos atendidos" (`/cocina/atendidos`).
 
 ### Rutas protegidas
 
@@ -85,9 +94,10 @@ Usuario de prueba: `cocina` / `1234`.
 
 ### Sistema de diseño
 
-Todos los valores visuales salen de `src/tema/tokens.ts`; las pantallas no escriben colores ni tamaños a mano.
+Todos los valores visuales salen de `src/tema/tokens.ts`; las pantallas no escriben colores, espaciados ni tipografías a mano.
 
-* **Identidad del Instituto Politécnico Formosa:** el escudo aparece en el inicio, en el login y en el ícono de la app. La paleta sale del escudo y del sitio institucional: verde `#078654`, verde oscuro `#08383F`, verde mar `#074D59` y crema `#E5EEE7`.
+* **Identidad del Instituto Politécnico Formosa:** el escudo aparece en el inicio, en el ticket de turno y en el ícono de la app, y el logo del instituto en el login. La paleta sale del escudo y del sitio institucional: verde `#067A4D` (el del escudo, apenas oscurecido para que se lea como texto), verde oscuro `#08383F`, verde mar `#074D59` y crema `#E5EEE7`.
+* **Degradados** (`expo-linear-gradient`) en el bloque de inicio y sobre las fotos, para que el texto se lea encima de la imagen.
 * **Un solo color de acción** (el verde del escudo) para lo que se puede tocar; ámbar para la nota de cocina y rojo para errores o acciones destructivas.
 * **Platos con foto** (`expo-image`), en una grilla de 1, 2 o 3 columnas según el ancho de la pantalla.
 * **Adaptable a escritorio y celular:** el contenido se centra con un ancho máximo y, en pantallas grandes, las pestañas pasan a ser una barra lateral.
@@ -101,7 +111,7 @@ Todos los valores visuales salen de `src/tema/tokens.ts`; las pantallas no escri
 
 ## 🔄 Justificación de `replace` vs `push` en el flujo de confirmación
 
-En la pantalla `/confirmar`, al presionar el botón "Confirmar Pedido", se utiliza `router.replace('/turno/' + numeroTurno)` en lugar de `router.push()`.
+En la pantalla `/confirmar`, al presionar el botón "Enviar a la cocina" (el que confirma el pedido), se utiliza `router.replace('/turno/' + numeroTurno)` en lugar de `router.push()`.
 
 **Justificación:**  
 Si usáramos `router.push()`, la pantalla de confirmación `/confirmar` se mantendría guardada en la pila del Stack por debajo de la pantalla de turno. Si el usuario presionara el botón de volver "atrás" desde la pantalla de su ticket de turno, reingresaría a la pantalla de confirmación y podría enviar accidentalmente el mismo pedido por segunda vez (duplicando el pedido y colando un segundo turno innecesario).  
