@@ -29,6 +29,7 @@ interface ComedorContextType {
 
   // Cola de Pedidos e Historial de Atendidos
   colaPedidosArray: Pedido[];
+  pedidoFrente: Pedido | undefined;
   historialAtendidosArray: Pedido[];
   confirmarPedido: () => Pedido | null;
   atenderSiguiente: () => Pedido | undefined;
@@ -137,10 +138,10 @@ export const ComedorProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return pedidoAtendido;
   };
 
+  // Cantidad de pedidos adelante del turno; -1 si el turno no está en la cola
   const obtenerPosicionEnCola = (numeroTurno: number): number => {
     const arr = colaPedidosRef.current.aArray();
-    const index = arr.findIndex((p) => p.numeroTurno === numeroTurno);
-    return index !== -1 ? index : 0;
+    return arr.findIndex((p) => p.numeroTurno === numeroTurno);
   };
 
   return (
@@ -158,6 +159,8 @@ export const ComedorProvider: React.FC<{ children: React.ReactNode }> = ({ child
         limpiarCarrito,
         totalCarrito,
         colaPedidosArray,
+        // frente() consulta el primer pedido sin desencolarlo
+        pedidoFrente: colaPedidosRef.current.frente(),
         historialAtendidosArray,
         confirmarPedido,
         atenderSiguiente,

@@ -8,7 +8,7 @@ const ARTICULOS = [
   { ruta: '/ayuda/pagos/tarjeta', titulo: 'Pagos con Tarjeta y Mercado Pago' },
   { ruta: '/ayuda/horarios', titulo: 'Horarios de Atención del Comedor' },
   { ruta: '/ayuda/cancelaciones/politica', titulo: 'Política de Cancelación de Pedidos' },
-];
+] as const;
 
 export default function PantallaAyudaIndex() {
   return (
@@ -17,7 +17,7 @@ export default function PantallaAyudaIndex() {
       <Text style={styles.subtitulo}>Selecciona un tema para consultar los detalles:</Text>
 
       {ARTICULOS.map((art) => (
-        <Link key={art.ruta} href={art.ruta as any} style={styles.cardArticulo}>
+        <Link key={art.ruta} href={art.ruta} style={styles.cardArticulo}>
           <Text style={styles.artTitulo}>{art.titulo}</Text>
           <Text style={styles.artRuta}>{art.ruta}</Text>
         </Link>

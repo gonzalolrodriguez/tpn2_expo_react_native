@@ -30,6 +30,10 @@ yarn-error.*
 # TypeScript
 *.tsbuildinfo
 
+# Herramientas locales
+.codegraph/
+.atl/
+
 # OS
 .DS_Store
 Thumbs.db

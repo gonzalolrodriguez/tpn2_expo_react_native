@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { usePathname, useSegments, useLocalSearchParams } from 'expo-router';
 
 const DEBUG = true; // Se puede cambiar a false para ocultar
 
 export const DondeEstoy: React.FC = () => {
-  if (!DEBUG) return null;
-
   const pathname = usePathname();
   const segments = useSegments();
   const params = useLocalSearchParams();
+
+  // Los hooks se llaman siempre; recién después se decide si se muestra
+  if (!DEBUG) return null;
 
   return (
     <View style={styles.container}>
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 11,
     color: '#475569',
-    fontFamily: 'Platform',
+    fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
     marginTop: 2,
   },
   bold: {

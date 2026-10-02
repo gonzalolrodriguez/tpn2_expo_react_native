@@ -4,9 +4,7 @@ import { useComedor } from '../../context/ComedorContext';
 import { DondeEstoy } from '../../components/DondeEstoy';
 
 export default function PantallaCocina() {
-  const { colaPedidosArray, atenderSiguiente } = useComedor();
-
-  const pedidoFrente = colaPedidosArray.length > 0 ? colaPedidosArray[0] : null;
+  const { colaPedidosArray, pedidoFrente, atenderSiguiente } = useComedor();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

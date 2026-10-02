@@ -1,10 +1,11 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
+import { Tabs } from 'expo-router/js-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useComedor } from '../../context/ComedorContext';
 
 export default function LayoutTabs() {
-  const { carrito } = useComedor();
+  const { carrito, usuario, colaPedidosArray } = useComedor();
+  const conSesion = usuario !== null;
 
   return (
     <Tabs
@@ -37,6 +38,18 @@ export default function LayoutTabs() {
           tabBarIcon: ({ color, size }) => <Ionicons name="cart-outline" size={size} color={color} />,
         }}
       />
+
+      {/* Desafío opcional: la pestaña Cocina solo existe con sesión iniciada */}
+      <Tabs.Protected guard={conSesion}>
+        <Tabs.Screen
+          name="personal"
+          options={{
+            title: 'Cocina',
+            tabBarBadge: colaPedidosArray.length > 0 ? colaPedidosArray.length : undefined,
+            tabBarIcon: ({ color, size }) => <Ionicons name="fast-food-outline" size={size} color={color} />,
+          }}
+        />
+      </Tabs.Protected>
     </Tabs>
   );
 }

@@ -18,7 +18,8 @@ export default function PantallaBuscar() {
   };
 
   const handleCategoriaChange = (cat: string) => {
-    router.setParams({ categoria: cat === 'todas' ? '' : cat });
+    // undefined quita el parámetro de la URL en lugar de dejar "categoria=" vacío
+    router.setParams({ categoria: cat === 'todas' ? undefined : cat });
   };
 
   // Filtrado dinámico

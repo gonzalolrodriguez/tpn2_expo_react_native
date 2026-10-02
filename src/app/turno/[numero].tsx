@@ -6,11 +6,46 @@ import { DondeEstoy } from '../../components/DondeEstoy';
 
 export default function PantallaTurno() {
   const { numero } = useLocalSearchParams<{ numero: string }>();
-  const { obtenerPosicionEnCola, colaPedidosArray } = useComedor();
+  const { obtenerPosicionEnCola, colaPedidosArray, historialAtendidosArray } = useComedor();
 
   const numTurno = Number(numero);
   const posicionAdelante = obtenerPosicionEnCola(numTurno);
+  const enCola = posicionAdelante !== -1;
+  const atendido = historialAtendidosArray.some((p) => p.numeroTurno === numTurno);
+
+  // El parámetro llega de la URL: puede no ser un número o no corresponder a ningún pedido
+  if (!Number.isInteger(numTurno) || numTurno < 1 || (!enCola && !atendido)) {
+    return (
+      <View style={[styles.container, styles.content]}>
+        <View style={styles.cardTurno}>
+          <Text style={styles.labelTurno}>TURNO NO ENCONTRADO</Text>
+          <Text style={styles.estadoError}>No existe ningún pedido con el turno "{numero}".</Text>
+        </View>
+        <Pressable style={styles.btnVolver} onPress={() => router.replace('/')}>
+          <Text style={styles.btnText}>🏠 Volver al Inicio</Text>
+        </Pressable>
+        <DondeEstoy />
+      </View>
+    );
+  }
+
   const tiempoEstimadoMinutos = posicionAdelante * 3;
+
+  if (atendido) {
+    return (
+      <View style={[styles.container, styles.content]}>
+        <View style={styles.cardTurno}>
+          <Text style={styles.labelTurno}>TURNO</Text>
+          <Text style={styles.numeroTurno}>#{numTurno}</Text>
+          <Text style={styles.estado}>🍽️ Tu pedido ya fue atendido. ¡Pasá a retirarlo!</Text>
+        </View>
+        <Pressable style={styles.btnVolver} onPress={() => router.replace('/')}>
+          <Text style={styles.btnText}>🏠 Volver al Inicio</Text>
+        </Pressable>
+        <DondeEstoy />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -79,6 +114,13 @@ const styles = StyleSheet.create({
     color: '#16a34a',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  estadoError: {
+    fontSize: 14,
+    color: '#dc2626',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 10,
   },
   infoBox: {
     backgroundColor: '#e0f2fe',

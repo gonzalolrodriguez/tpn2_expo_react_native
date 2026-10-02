@@ -22,6 +22,7 @@ export default function PantallaConfirmar() {
         <Pressable style={styles.btnVolver} onPress={() => router.back()}>
           <Text style={styles.btnVolverText}>Volver al carrito</Text>
         </Pressable>
+        <DondeEstoy />
       </View>
     );
   }
