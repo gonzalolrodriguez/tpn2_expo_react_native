@@ -168,10 +168,40 @@ Gracias a `unstable_settings = { anchor: '(tabs)' }` en el layout raíz, abrir u
 
 ## 📸 Capturas
 
-Pendiente: agregar capturas o un video corto de estos flujos.
+Capturas de la versión web (`npx expo start --web`) en tamaño de celular. Están en `docs/capturas/`.
 
-* Carrito con "Deshacer último"
-* Ticket de turno
-* Cocina atendiendo pedidos
-* Login y logout
-* Pantalla 404
+### Carrito con "Deshacer último" (Pila)
+
+Con dos platos en el carrito, "Deshacer último" hace `pop` en la pila de acciones y quita el último plato agregado.
+
+| Antes de deshacer | Después de deshacer |
+| :---: | :---: |
+| <img src="docs/capturas/01-carrito-deshacer.png" width="260" alt="Carrito con dos platos y el botón Deshacer último (2)"> | <img src="docs/capturas/02-carrito-tras-deshacer.png" width="260" alt="Carrito con un plato después de deshacer"> |
+
+### Confirmación y ticket de turno (Cola)
+
+Al confirmar, el pedido se encola y `router.replace` lleva al ticket. El turno #2 tiene un pedido adelante y 3 minutos de espera estimada.
+
+| Confirmar pedido | Ticket de turno |
+| :---: | :---: |
+| <img src="docs/capturas/03-confirmar.png" width="260" alt="Pantalla de confirmación con el botón Confirmar"> | <img src="docs/capturas/04-turno.png" width="260" alt="Ticket del turno 2 con un pedido adelante"> |
+
+### Login y logout (rutas protegidas)
+
+Con sesión iniciada aparecen la pestaña **Cocina** y el acceso "Panel de cocina". Al cerrar sesión desaparecen y vuelve "Acceso de cocina".
+
+| Login | Sesión iniciada | Sesión cerrada |
+| :---: | :---: | :---: |
+| <img src="docs/capturas/05-login.png" width="260" alt="Pantalla de inicio de sesión"> | <img src="docs/capturas/06-sesion-iniciada.png" width="260" alt="Inicio con la pestaña Cocina y el acceso Panel de cocina"> | <img src="docs/capturas/09-sesion-cerrada.png" width="260" alt="Inicio sin la pestaña Cocina después de cerrar sesión"> |
+
+### Cocina atendiendo pedidos
+
+La cocina ve el frente de la cola y lo desencola con "Atender siguiente". Los atendidos se guardan en una pila: el último atendido aparece primero.
+
+| Pedidos en cola | Pedidos atendidos |
+| :---: | :---: |
+| <img src="docs/capturas/07-cocina-cola.png" width="260" alt="Cocina con el turno 1 al frente de la cola"> | <img src="docs/capturas/08-cocina-atendidos.png" width="260" alt="Historial con el turno 2 en el tope de la pila"> |
+
+### Pantalla 404
+
+<img src="docs/capturas/10-404.png" width="260" alt="Pantalla 404 para una ruta inexistente">
