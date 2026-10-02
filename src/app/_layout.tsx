@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ComedorProvider, useComedor } from '../context/ComedorContext';
 import { TituloConPila } from '../components/TituloConPila';
+import { opcionesHeader } from '../tema/tokens';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -15,8 +16,7 @@ function NavegacionRaiz() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: '#2563eb' },
-        headerTintColor: '#fff',
+        ...opcionesHeader,
         // Desafío opcional: el título muestra cuántas pantallas hay en la pila
         headerTitle: (props) => <TituloConPila {...props} />,
       }}
@@ -26,16 +26,16 @@ function NavegacionRaiz() {
 
       {/* Rutas dinámicas en el Stack raíz */}
       <Stack.Screen name="categorias/[categoria]" options={{ title: 'Categoría' }} />
-      <Stack.Screen name="buscar" options={{ title: 'Buscador de Platos' }} />
+      <Stack.Screen name="buscar" options={{ title: 'Buscar platos' }} />
 
       {/* Flujo de pedido */}
-      <Stack.Screen name="confirmar" options={{ presentation: 'modal', title: 'Confirmar Pedido' }} />
-      <Stack.Screen name="turno/[numero]" options={{ title: 'Su Turno' }} />
+      <Stack.Screen name="confirmar" options={{ presentation: 'modal', title: 'Confirmar pedido' }} />
+      <Stack.Screen name="turno/[numero]" options={{ title: 'Tu turno' }} />
 
       {/* Ayuda y Redirección */}
-      <Stack.Screen name="ayuda/index" options={{ title: 'Centro de Ayuda' }} />
-      <Stack.Screen name="ayuda/[...slug]" options={{ title: 'Artículo de Ayuda' }} />
-      <Stack.Screen name="pedido" options={{ title: 'Redireccionando...' }} />
+      <Stack.Screen name="ayuda/index" options={{ title: 'Ayuda' }} />
+      <Stack.Screen name="ayuda/[...slug]" options={{ title: 'Artículo de ayuda' }} />
+      <Stack.Screen name="pedido" options={{ title: 'Abriendo el carrito' }} />
 
       {/* Rutas protegidas: cuando el guard es false la pantalla no existe y sale del historial */}
       <Stack.Protected guard={conSesion}>
@@ -43,7 +43,7 @@ function NavegacionRaiz() {
       </Stack.Protected>
 
       <Stack.Protected guard={!conSesion}>
-        <Stack.Screen name="login" options={{ presentation: 'modal', title: 'Iniciar Sesión - Cocina' }} />
+        <Stack.Screen name="login" options={{ presentation: 'modal', title: 'Iniciar sesión' }} />
       </Stack.Protected>
 
       {/* Pantalla 404 */}

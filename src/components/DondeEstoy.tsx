@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useSegments, useLocalSearchParams } from 'expo-router';
+import { colores, espacio, radio, tamanioIcono, tipo } from '../tema/tokens';
 
 const DEBUG = true; // Se puede cambiar a false para ocultar
 
@@ -13,18 +15,21 @@ export const DondeEstoy: React.FC = () => {
   if (!DEBUG) return null;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>📍 Inspector de Ruta [DEBUG]</Text>
-      <Text style={styles.text}>
-        <Text style={styles.bold}>Pathname: </Text>
+    <View style={styles.panel}>
+      <View style={styles.encabezado}>
+        <Ionicons name="navigate-outline" size={tamanioIcono.sm} color={colores.tintaSecundaria} />
+        <Text style={[tipo.nota, styles.fuerte]}>Inspector de ruta (debug)</Text>
+      </View>
+      <Text selectable style={[tipo.nota, styles.codigo]}>
+        <Text style={styles.fuerte}>Pathname: </Text>
         {pathname}
       </Text>
-      <Text style={styles.text}>
-        <Text style={styles.bold}>Segments: </Text>
+      <Text selectable style={[tipo.nota, styles.codigo]}>
+        <Text style={styles.fuerte}>Segments: </Text>
         {JSON.stringify(segments)}
       </Text>
-      <Text style={styles.text}>
-        <Text style={styles.bold}>Params: </Text>
+      <Text selectable style={[tipo.nota, styles.codigo]}>
+        <Text style={styles.fuerte}>Params: </Text>
         {JSON.stringify(params)}
       </Text>
     </View>
@@ -32,27 +37,24 @@ export const DondeEstoy: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    margin: 12,
-    padding: 12,
-    backgroundColor: '#f1f5f9',
-    borderColor: '#cbd5e1',
-    borderWidth: 1,
-    borderRadius: 8,
+  // Panel secundario: superficie hundida y sin sombra, para que no compita con el contenido
+  panel: {
+    gap: espacio.xs,
+    padding: espacio.md,
+    backgroundColor: colores.superficieHundida,
+    borderRadius: radio.control,
+    borderCurve: 'continuous',
   },
-  title: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: '#334155',
-    marginBottom: 4,
+  encabezado: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: espacio.xs,
   },
-  text: {
-    fontSize: 11,
-    color: '#475569',
+  codigo: {
+    // Monoespaciada a propósito: lo que se muestra son rutas y JSON
     fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
-    marginTop: 2,
   },
-  bold: {
-    fontWeight: 'bold',
+  fuerte: {
+    fontWeight: tipo.cuerpoFuerte.fontWeight,
   },
 });

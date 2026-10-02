@@ -1,25 +1,35 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { PLATOS } from '../../../data/platos';
-import { TarjetaPlato } from '../../../components/TarjetaPlato';
+import { Chip } from '../../../components/Chip';
 import { DondeEstoy } from '../../../components/DondeEstoy';
+import { Grupo } from '../../../components/Grupo';
+import { Pantalla } from '../../../components/Pantalla';
+import { TarjetaPlato } from '../../../components/TarjetaPlato';
+import { espacio, tipo } from '../../../tema/tokens';
 
 const CATEGORIAS = [
-  { id: 'desayuno', nombre: 'Desayunos ☕' },
-  { id: 'almuerzo', nombre: 'Almuerzos 🍲' },
-  { id: 'bebidas', nombre: 'Bebidas 🥤' },
-  { id: 'kiosco', nombre: 'Kiosco 🍫' },
-];
+  { id: 'desayuno', nombre: 'Desayunos' },
+  { id: 'almuerzo', nombre: 'Almuerzos' },
+  { id: 'bebidas', nombre: 'Bebidas' },
+  { id: 'kiosco', nombre: 'Kiosco' },
+] as const;
 
 export default function PantallaMenu() {
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.subtitulo}>Categorías rápidas:</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll}>
+    <Pantalla>
+      {/* Accesos a cada categoría. La fila se extiende hasta los bordes de la pantalla al desplazar. */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        accessibilityLabel="Categorías del menú"
+        style={styles.categorias}
+        contentContainerStyle={styles.categoriasContenido}
+      >
         {CATEGORIAS.map((cat) => (
-          <Link key={cat.id} href={`/categorias/${cat.id}`} style={styles.chipCat}>
-            <Text style={styles.chipText}>{cat.nombre}</Text>
+          <Link key={cat.id} href={`/categorias/${cat.id}`} asChild>
+            <Chip titulo={cat.nombre} />
           </Link>
         ))}
       </ScrollView>
@@ -28,70 +38,36 @@ export default function PantallaMenu() {
         const platosCat = PLATOS.filter((p) => p.categoria === cat.id);
         return (
           <View key={cat.id} style={styles.seccion}>
-            <View style={styles.seccionHeader}>
-              <Text style={styles.tituloSeccion}>{cat.nombre}</Text>
-              <Link href={`/categorias/${cat.id}`}>
-                <Text style={styles.verMas}>Ver todo →</Text>
-              </Link>
-            </View>
-            {platosCat.map((plato) => (
-              <TarjetaPlato key={plato.id} plato={plato} />
-            ))}
+            <Text style={tipo.titulo} accessibilityRole="header">
+              {cat.nombre}
+            </Text>
+            <Grupo>
+              {platosCat.map((plato) => (
+                <TarjetaPlato key={plato.id} plato={plato} />
+              ))}
+            </Grupo>
           </View>
         );
       })}
 
       <DondeEstoy />
-    </ScrollView>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
+  categorias: {
+    // Compensa el relleno de la pantalla para que los chips no se corten antes del borde
+    marginHorizontal: -espacio.lg,
+    flexGrow: 0,
   },
-  content: {
-    padding: 16,
-  },
-  subtitulo: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 8,
-    fontWeight: '600',
-  },
-  catScroll: {
-    marginBottom: 16,
-  },
-  chipCat: {
-    backgroundColor: '#e2e8f0',
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    marginRight: 8,
-  },
-  chipText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#334155',
+  categoriasContenido: {
+    gap: espacio.sm,
+    paddingHorizontal: espacio.lg,
   },
   seccion: {
-    marginBottom: 20,
-  },
-  seccionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  tituloSeccion: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  verMas: {
-    fontSize: 13,
-    color: '#2563eb',
-    fontWeight: 'bold',
+    // Más aire arriba del título que debajo: el título pertenece a su lista
+    marginTop: espacio.sm,
+    gap: espacio.sm,
   },
 });

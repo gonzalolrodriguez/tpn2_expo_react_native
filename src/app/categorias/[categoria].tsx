@@ -1,9 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { Text, StyleSheet } from 'react-native';
+import { useLocalSearchParams, Stack, Link } from 'expo-router';
 import { PLATOS } from '../../data/platos';
-import { TarjetaPlato } from '../../components/TarjetaPlato';
+import { Boton } from '../../components/Boton';
 import { DondeEstoy } from '../../components/DondeEstoy';
+import { EstadoVacio } from '../../components/EstadoVacio';
+import { Grupo } from '../../components/Grupo';
+import { Pantalla } from '../../components/Pantalla';
+import { TarjetaPlato } from '../../components/TarjetaPlato';
+import { espacio, tipo } from '../../tema/tokens';
 
 const CATEGORIAS_VALIDAS = ['desayuno', 'almuerzo', 'bebidas', 'kiosco'];
 
@@ -15,13 +20,19 @@ export default function PantallaCategoria() {
 
   if (!esValida) {
     return (
-      <View style={styles.errorContainer}>
+      <Pantalla>
         <Stack.Screen options={{ title: 'Categoría no encontrada' }} />
-        <Text style={styles.errorText}>
-          ⚠️ La categoría "{categoria}" no existe. Las categorías disponibles son: desayuno, almuerzo, bebidas, kiosco.
-        </Text>
+        <EstadoVacio
+          icono="alert-circle-outline"
+          titulo="Esa categoría no existe"
+          mensaje={`"${categoria}" no está en el menú. Las categorías son desayuno, almuerzo, bebidas y kiosco.`}
+        >
+          <Link href="/menu" asChild>
+            <Boton titulo="Ver el menú" />
+          </Link>
+        </EstadoVacio>
         <DondeEstoy />
-      </View>
+      </Pantalla>
     );
   }
 
@@ -29,51 +40,29 @@ export default function PantallaCategoria() {
   const tituloFormatted = catNormalizada.charAt(0).toUpperCase() + catNormalizada.slice(1);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Stack.Screen options={{ title: `Categoría: ${tituloFormatted}` }} />
+    <Pantalla>
+      {/* El nombre de la categoría ya está en el header: no se repite en la página */}
+      <Stack.Screen options={{ title: tituloFormatted }} />
 
-      <Text style={styles.titulo}>Platos de {tituloFormatted}</Text>
-      <Text style={styles.subtitulo}>Total de opciones disponibles: {platosFiltrados.length}</Text>
+      <Text style={[tipo.nota, styles.cantidad]}>
+        {platosFiltrados.length === 1 ? '1 opción disponible' : `${platosFiltrados.length} opciones disponibles`}
+      </Text>
 
-      {platosFiltrados.map((plato) => (
-        <TarjetaPlato key={plato.id} plato={plato} />
-      ))}
+      <Grupo>
+        {platosFiltrados.map((plato) => (
+          <TarjetaPlato key={plato.id} plato={plato} />
+        ))}
+      </Grupo>
 
       <DondeEstoy />
-    </ScrollView>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  content: {
-    padding: 16,
-  },
-  errorContainer: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#dc2626',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#0f172a',
-  },
-  subtitulo: {
-    fontSize: 13,
-    color: '#64748b',
-    marginBottom: 16,
+  cantidad: {
+    fontVariant: ['tabular-nums'],
+    // El contador pertenece a la lista: se acerca a ella
+    marginBottom: -espacio.sm,
   },
 });

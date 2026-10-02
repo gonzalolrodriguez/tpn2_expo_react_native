@@ -1,96 +1,67 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Plato } from '../data/platos';
 import { useComedor } from '../context/ComedorContext';
+import { Presionable } from './Presionable';
+import { colores, espacio, fila, formatoPrecio, radio, tamanioIcono, tipo, TOQUE_MINIMO } from '../tema/tokens';
 
 interface Props {
   plato: Plato;
   mostrarBotonAgregar?: boolean;
 }
 
+// Fila de plato para usar dentro de <Grupo>. Tocar el texto abre el detalle;
+// el botón de la derecha agrega el plato al carrito sin salir de la lista.
 export const TarjetaPlato: React.FC<Props> = ({ plato, mostrarBotonAgregar = true }) => {
   const { agregarAlCarrito } = useComedor();
 
   return (
-    <View style={styles.card}>
+    <View style={styles.fila}>
+      {/* El flex va en este View: <Link asChild> pisa el style del hijo */}
       <View style={styles.info}>
-        <Text style={styles.nombre}>{plato.nombre}</Text>
-        <Text style={styles.descripcion} numberOfLines={2}>
-          {plato.descripcion}
-        </Text>
-        <Text style={styles.precio}>${plato.precio.toLocaleString('es-AR')}</Text>
-      </View>
-      <View style={styles.acciones}>
-        <Link href={`/menu/${plato.id}`} style={styles.btnDetalle}>
-          <Text style={styles.btnTextSecundario}>Ver Detalle</Text>
+        <Link href={`/menu/${plato.id}`} asChild>
+          <Presionable estilo={styles.textos} accessibilityHint="Abre el detalle del plato">
+            <Text style={tipo.cuerpoFuerte}>{plato.nombre}</Text>
+            <Text style={tipo.nota} numberOfLines={2}>
+              {plato.descripcion}
+            </Text>
+            <Text style={tipo.precio}>{formatoPrecio(plato.precio)}</Text>
+          </Presionable>
         </Link>
-        {mostrarBotonAgregar && (
-          <Pressable style={styles.btnAgregar} onPress={() => agregarAlCarrito(plato)}>
-            <Text style={styles.btnText}>+ Agregar</Text>
-          </Pressable>
-        )}
       </View>
+
+      {mostrarBotonAgregar ? (
+        <Presionable
+          accessibilityRole="button"
+          accessibilityLabel={`Agregar ${plato.nombre} al carrito`}
+          onPress={() => agregarAlCarrito(plato)}
+          estilo={styles.agregar}
+        >
+          <Ionicons name="add-outline" size={tamanioIcono.lg} color={colores.marca} />
+        </Presionable>
+      ) : null}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+  fila: {
+    ...fila,
   },
   info: {
-    marginBottom: 10,
+    flex: 1,
   },
-  nombre: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1e293b',
+  textos: {
+    gap: espacio.xs,
   },
-  descripcion: {
-    fontSize: 13,
-    color: '#64748b',
-    marginTop: 4,
-  },
-  precio: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#16a34a',
-    marginTop: 6,
-  },
-  acciones: {
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'flex-end',
-  },
-  btnDetalle: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    backgroundColor: '#f1f5f9',
-  },
-  btnAgregar: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    backgroundColor: '#2563eb',
-  },
-  btnTextSecundario: {
-    fontSize: 12,
-    color: '#475569',
-    fontWeight: '600',
-  },
-  btnText: {
-    fontSize: 12,
-    color: '#ffffff',
-    fontWeight: 'bold',
+  agregar: {
+    width: TOQUE_MINIMO,
+    height: TOQUE_MINIMO,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radio.pildora,
+    backgroundColor: colores.marcaSuave,
   },
 });

@@ -46,6 +46,10 @@ src/
 │   ├── DondeEstoy.tsx                  -> Inspector de ruta DEBUG (usePathname, useSegments, useLocalSearchParams)
 │   ├── TarjetaPlato.tsx                -> Componente reutilizable para platos
 │   └── TituloConPila.tsx               -> Título de header con el contador de pantallas en la pila (useNavigation().getState())
+│   (más los componentes de interfaz compartidos: Pantalla, Boton, Presionable, Grupo, FilaEnlace,
+│    FilaDato, Campo, Chip, NotaCocina y EstadoVacio)
+├── tema/
+│   └── tokens.ts                       -> Sistema de diseño: colores, espaciado, tipografía, radios y sombras
 ├── context/
 │   └── ComedorContext.tsx              -> Contexto global (sesión, carrito, Pila de deshacer, Cola de pedidos)
 ├── data/
@@ -77,6 +81,16 @@ Usuario de prueba: `cocina` / `1234`.
 * **Tab protegida:** pestaña **Cocina** con `Tabs.Protected`.
 * **Hoja inferior:** `/carrito/nota` con `presentation: "formSheet"` y `sheetAllowedDetents`.
 * **Tiempo estimado:** `/turno/[numero]` multiplica la posición en la cola por 3 minutos.
+
+### Sistema de diseño
+
+Todos los valores visuales salen de `src/tema/tokens.ts`; las pantallas no escriben colores ni tamaños a mano.
+
+* **Un solo color de acción** (verde yerba) para lo que se puede tocar; ámbar para la nota de cocina y rojo para errores o acciones destructivas.
+* **Listas agrupadas** (`Grupo`) con filas separadas por líneas finas, en lugar de una tarjeta por elemento.
+* **Áreas táctiles de 48 px** como mínimo y respuesta visual al apoyar el dedo (`Presionable`, `Boton`).
+* **Íconos de `@expo/vector-icons`** (Ionicons) en toda la app; no se usan emojis como íconos.
+* **Búsqueda sin tildes ni mayúsculas:** "chipa" encuentra "Chipá".
 
 ---
 

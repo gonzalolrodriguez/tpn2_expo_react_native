@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { useComedor } from '../context/ComedorContext';
+import { Boton } from '../components/Boton';
+import { Campo } from '../components/Campo';
 import { DondeEstoy } from '../components/DondeEstoy';
+import { Pantalla } from '../components/Pantalla';
+import { colores, tipo } from '../tema/tokens';
 
 export default function PantallaLogin() {
   const { iniciarSesion } = useComedor();
@@ -13,105 +17,51 @@ export default function PantallaLogin() {
     setError('');
     const exito = iniciarSesion(user, pass);
     if (!exito) {
-      setError('Credenciales incorrectas. Proba con cocina / 1234');
+      setError('El usuario o la contraseña no coinciden. Probá con cocina y 1234.');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>🔐 Acceso de Personal (Cocina)</Text>
-      <Text style={styles.subtitulo}>Ingresá con tu cuenta para gestionar los pedidos en cola.</Text>
+    <Pantalla>
+      <Text style={[tipo.cuerpo, styles.intro]}>
+        Ingresá con la cuenta del personal para atender los pedidos en cola.
+      </Text>
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-      <Text style={styles.label}>Usuario:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ej: cocina"
+      <Campo
+        etiqueta="Usuario"
+        placeholder="cocina"
         value={user}
         onChangeText={setUser}
         autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="username"
+        textContentType="username"
+        returnKeyType="next"
       />
 
-      <Text style={styles.label}>Contraseña:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ej: 1234"
+      {/* El error va pegado a los campos, no arriba del formulario */}
+      <Campo
+        etiqueta="Contraseña"
+        ayuda="Cuenta de prueba: usuario cocina, contraseña 1234."
+        error={error}
         value={pass}
         onChangeText={setPass}
         secureTextEntry
+        autoComplete="current-password"
+        textContentType="password"
+        returnKeyType="go"
+        onSubmitEditing={handleLogin}
       />
 
-      <Pressable style={styles.btnIngresar} onPress={handleLogin}>
-        <Text style={styles.btnText}>Iniciar Sesión</Text>
-      </Pressable>
-
-      <Text style={styles.pista}>💡 Pista de prueba: usuario "cocina", clave "1234"</Text>
+      <Boton titulo="Iniciar sesión" onPress={handleLogin} />
 
       <DondeEstoy />
-    </View>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 6,
-  },
-  subtitulo: {
-    fontSize: 13,
-    color: '#64748b',
-    marginBottom: 20,
-  },
-  errorText: {
-    color: '#dc2626',
-    backgroundColor: '#fee2e2',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 16,
-    fontSize: 13,
-    fontWeight: 'bold',
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#334155',
-    marginBottom: 4,
-  },
-  input: {
-    backgroundColor: '#f8fafc',
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-    marginBottom: 16,
-  },
-  btnIngresar: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  btnText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  pista: {
-    fontSize: 12,
-    color: '#94a3b8',
-    textAlign: 'center',
-    marginTop: 16,
+  intro: {
+    color: colores.tintaSecundaria,
   },
 });

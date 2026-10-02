@@ -1,11 +1,32 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, ScrollView, Pressable } from 'react-native';
+import { Text, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { PLATOS } from '../data/platos';
-import { TarjetaPlato } from '../components/TarjetaPlato';
+import { Boton } from '../components/Boton';
+import { Campo } from '../components/Campo';
+import { Chip } from '../components/Chip';
 import { DondeEstoy } from '../components/DondeEstoy';
+import { EstadoVacio } from '../components/EstadoVacio';
+import { Grupo } from '../components/Grupo';
+import { Pantalla } from '../components/Pantalla';
+import { TarjetaPlato } from '../components/TarjetaPlato';
+import { espacio, tipo } from '../tema/tokens';
 
-const CATEGORIAS = ['todas', 'desayuno', 'almuerzo', 'bebidas', 'kiosco'];
+const CATEGORIAS = [
+  { id: 'todas', nombre: 'Todas' },
+  { id: 'desayuno', nombre: 'Desayuno' },
+  { id: 'almuerzo', nombre: 'Almuerzo' },
+  { id: 'bebidas', nombre: 'Bebidas' },
+  { id: 'kiosco', nombre: 'Kiosco' },
+];
+
+// Pasa a minúsculas y quita los signos diacríticos (á → a) para comparar textos
+const normalizar = (texto: string) =>
+  texto
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
 
 export default function PantallaBuscar() {
   const params = useLocalSearchParams<{ q?: string; categoria?: string }>();
@@ -22,11 +43,15 @@ export default function PantallaBuscar() {
     router.setParams({ categoria: cat === 'todas' ? undefined : cat });
   };
 
-  // Filtrado dinámico
+  const borrarBusqueda = () => {
+    router.setParams({ q: undefined, categoria: undefined });
+  };
+
+  // Filtrado dinámico: sin distinguir mayúsculas ni tildes ("chipa" encuentra "Chipá")
+  const buscado = normalizar(queryText);
   const resultados = PLATOS.filter((plato) => {
     const coincideTexto =
-      plato.nombre.toLowerCase().includes(queryText.toLowerCase()) ||
-      plato.descripcion.toLowerCase().includes(queryText.toLowerCase());
+      normalizar(plato.nombre).includes(buscado) || normalizar(plato.descripcion).includes(buscado);
 
     const coincideCat =
       categoriaSeleccionada === 'todas' || !categoriaSeleccionada || plato.categoria === categoriaSeleccionada;
@@ -35,122 +60,78 @@ export default function PantallaBuscar() {
   });
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.titulo}>🔍 Buscador de Platos</Text>
-
+    <Pantalla>
       {/* Input de búsqueda */}
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Buscar por nombre o ingrediente..."
+      <Campo
+        etiqueta="Nombre o ingrediente"
+        placeholder="Milanesa, café, alfajor"
         value={queryText}
         onChangeText={handleSearchTextChange}
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="search"
+        clearButtonMode="while-editing"
       />
 
-      {/* Filtro por Categorías */}
-      <Text style={styles.subtitulo}>Filtrar por categoría:</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll}>
-        {CATEGORIAS.map((cat) => {
-          const activa = (categoriaSeleccionada || 'todas') === cat;
-          return (
-            <Pressable
-              key={cat}
-              style={[styles.chipCat, activa && styles.chipCatActiva]}
-              onPress={() => handleCategoriaChange(cat)}
-            >
-              <Text style={[styles.chipText, activa && styles.chipTextActivo]}>
-                {cat.toUpperCase()}
-              </Text>
-            </Pressable>
-          );
-        })}
+      {/* Filtro por categorías. La fila se extiende hasta los bordes de la pantalla al desplazar. */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        accessibilityLabel="Filtrar por categoría"
+        style={styles.categorias}
+        contentContainerStyle={styles.categoriasContenido}
+      >
+        {CATEGORIAS.map((cat) => (
+          <Chip
+            key={cat.id}
+            titulo={cat.nombre}
+            seleccionado={categoriaSeleccionada === cat.id}
+            onPress={() => handleCategoriaChange(cat.id)}
+          />
+        ))}
       </ScrollView>
 
       {/* Resultados */}
-      <Text style={styles.resultadosTitulo}>
-        Resultados ({resultados.length}):
-      </Text>
-
       {resultados.length === 0 ? (
-        <View style={styles.noResultados}>
-          <Text style={styles.noResultadosText}>
-            No se encontraron platos que coincidan con la búsqueda.
-          </Text>
-        </View>
+        <EstadoVacio
+          icono="search-outline"
+          titulo="No encontramos platos"
+          mensaje="Ningún plato coincide con la búsqueda. Probá con otra palabra o quitá el filtro de categoría."
+        >
+          <Boton variante="secundario" titulo="Borrar búsqueda" onPress={borrarBusqueda} />
+        </EstadoVacio>
       ) : (
-        resultados.map((plato) => <TarjetaPlato key={plato.id} plato={plato} />)
+        <>
+          <Text style={[tipo.nota, styles.cantidad]} accessibilityLiveRegion="polite">
+            {resultados.length === 1 ? '1 resultado' : `${resultados.length} resultados`}
+          </Text>
+          <Grupo>
+            {resultados.map((plato) => (
+              <TarjetaPlato key={plato.id} plato={plato} />
+            ))}
+          </Grupo>
+        </>
       )}
 
       <DondeEstoy />
-    </ScrollView>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
+  categorias: {
+    // Compensa el relleno de la pantalla para que los chips no se corten antes del borde
+    marginHorizontal: -espacio.lg,
+    flexGrow: 0,
   },
-  content: {
-    padding: 16,
+  categoriasContenido: {
+    gap: espacio.sm,
+    paddingHorizontal: espacio.lg,
   },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 12,
-  },
-  searchInput: {
-    backgroundColor: '#ffffff',
-    borderColor: '#cbd5e1',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 15,
-    color: '#1e293b',
-    marginBottom: 16,
-  },
-  subtitulo: {
-    fontSize: 13,
-    color: '#64748b',
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  catScroll: {
-    marginBottom: 16,
-  },
-  chipCat: {
-    backgroundColor: '#e2e8f0',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    marginRight: 6,
-  },
-  chipCatActiva: {
-    backgroundColor: '#2563eb',
-  },
-  chipText: {
-    fontSize: 12,
-    color: '#475569',
-    fontWeight: 'bold',
-  },
-  chipTextActivo: {
-    color: '#ffffff',
-  },
-  resultadosTitulo: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 10,
-  },
-  noResultados: {
-    padding: 20,
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-  },
-  noResultadosText: {
-    color: '#64748b',
-    fontSize: 14,
+  cantidad: {
+    fontVariant: ['tabular-nums'],
+    // El contador pertenece a la lista: se acerca a ella y se aleja de los filtros
+    marginBottom: -espacio.sm,
   },
 });

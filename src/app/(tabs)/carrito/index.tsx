@@ -1,8 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 import { useComedor } from '../../../context/ComedorContext';
+import { Boton } from '../../../components/Boton';
 import { DondeEstoy } from '../../../components/DondeEstoy';
+import { EstadoVacio } from '../../../components/EstadoVacio';
+import { FilaDato } from '../../../components/FilaDato';
+import { Grupo } from '../../../components/Grupo';
+import { NotaCocina } from '../../../components/NotaCocina';
+import { Pantalla } from '../../../components/Pantalla';
+import { espacio, formatoPrecio } from '../../../tema/tokens';
 
 export default function PantallaCarrito() {
   const {
@@ -15,253 +22,78 @@ export default function PantallaCarrito() {
   } = useComedor();
 
   const esPilaVacia = pilaDeshacerTamanio === 0;
+  const carritoVacio = carrito.length === 0;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {carrito.length === 0 ? (
-        <View style={styles.vacioContainer}>
-          <Text style={styles.vacioIcono}>🛒</Text>
-          <Text style={styles.vacioTitulo}>El carrito está vacío</Text>
-          <Text style={styles.vacioSub}>Agregá algunos platos deliciosos desde el menú.</Text>
-          <Link href="/menu" style={styles.btnIrMenu}>
-            <Text style={styles.btnText}>Ver Menú</Text>
+    <Pantalla>
+      {carritoVacio ? (
+        <EstadoVacio
+          icono="cart-outline"
+          titulo="Tu carrito está vacío"
+          mensaje="Agregá platos desde el menú para armar tu pedido."
+        >
+          <Link href="/menu" asChild>
+            <Boton titulo="Ver el menú" />
           </Link>
-        </View>
+        </EstadoVacio>
       ) : (
-        <>
-          <View style={styles.headerControl}>
-            <Text style={styles.tituloSec}>Ítems agregados ({carrito.length}):</Text>
-
-            {/* Botón Deshacer Último usando la Pila */}
-            <Pressable
-              style={[styles.btnDeshacer, esPilaVacia && styles.btnDeshacerDeshabilitado]}
-              onPress={deshacerUltimo}
-              disabled={esPilaVacia}
-            >
-              <Text style={styles.btnDeshacerText}>
-                ↩️ Deshacer último ({pilaDeshacerTamanio})
-              </Text>
-            </Pressable>
-          </View>
-
+        <Grupo>
           {carrito.map((item, index) => (
-            <View key={`${item.id}-${index}`} style={styles.itemRow}>
-              <View style={styles.itemInfo}>
-                <Text style={styles.itemNombre}>{item.nombre}</Text>
-                <Text style={styles.itemCategoria}>{item.categoria.toUpperCase()}</Text>
-              </View>
-              <Text style={styles.itemPrecio}>${item.precio.toLocaleString('es-AR')}</Text>
-            </View>
+            <FilaDato key={`${item.id}-${index}`} titulo={item.nombre} valor={formatoPrecio(item.precio)} />
           ))}
+          <FilaDato fuerte titulo="Total" valor={formatoPrecio(totalCarrito)} />
+        </Grupo>
+      )}
 
-          {notaCarrito !== '' && (
-            <View style={styles.notaCard}>
-              <Text style={styles.notaTitulo}>📝 Nota para cocina:</Text>
-              <Text style={styles.notaTexto}>"{notaCarrito}"</Text>
-            </View>
-          )}
+      {/* Deshacer usa la Pila: siempre visible, deshabilitado cuando la pila está vacía */}
+      <View style={styles.edicion}>
+        <Boton
+          variante="secundario"
+          icono="arrow-undo-outline"
+          titulo={`Deshacer último (${pilaDeshacerTamanio})`}
+          onPress={deshacerUltimo}
+          disabled={esPilaVacia}
+          contenedor={styles.deshacer}
+        />
+        {carritoVacio ? null : <Boton variante="peligro" titulo="Vaciar" onPress={limpiarCarrito} />}
+      </View>
 
-          <Link href="/carrito/nota" style={styles.btnNota}>
-            <Text style={styles.btnNotaText}>
-              {notaCarrito ? '✏️ Modificar nota para cocina' : '+ Agregar nota / aclaración'}
-            </Text>
-          </Link>
+      {carritoVacio ? null : (
+        <>
+          {notaCarrito !== '' ? <NotaCocina nota={notaCarrito} /> : null}
 
-          <View style={styles.totalCard}>
-            <Text style={styles.totalLabel}>Total a Pagar:</Text>
-            <Text style={styles.totalValor}>${totalCarrito.toLocaleString('es-AR')}</Text>
-          </View>
-
-          <View style={styles.acciones}>
-            <Pressable style={styles.btnLimpiar} onPress={limpiarCarrito}>
-              <Text style={styles.btnLimpiarText}>Vaciar</Text>
-            </Pressable>
+          <View style={styles.cierre}>
+            <Link href="/carrito/nota" asChild>
+              <Boton
+                variante="texto"
+                icono="create-outline"
+                titulo={notaCarrito ? 'Cambiar la nota para la cocina' : 'Agregar una nota para la cocina'}
+              />
+            </Link>
 
             {/* El usuario toca un botón: se navega con <Link>, no con router */}
             <Link href="/confirmar" asChild>
-              <Pressable style={styles.btnConfirmar}>
-                <Text style={styles.btnConfirmarText}>Confirmar Pedido ➔</Text>
-              </Pressable>
+              <Boton titulo="Confirmar pedido" />
             </Link>
           </View>
         </>
       )}
 
       <DondeEstoy />
-    </ScrollView>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  content: {
-    padding: 16,
-  },
-  vacioContainer: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  vacioIcono: {
-    fontSize: 50,
-    marginBottom: 12,
-  },
-  vacioTitulo: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#334155',
-  },
-  vacioSub: {
-    fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
-    marginTop: 4,
-    marginBottom: 20,
-  },
-  btnIrMenu: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  btnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  headerControl: {
+  edicion: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    gap: espacio.sm,
   },
-  tituloSec: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  btnDeshacer: {
-    backgroundColor: '#ef4444',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-  },
-  btnDeshacerDeshabilitado: {
-    backgroundColor: '#cbd5e1',
-  },
-  btnDeshacerText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  itemRow: {
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  itemInfo: {
+  // Deshacer ocupa el ancho libre; Vaciar queda del ancho de su texto
+  deshacer: {
     flex: 1,
   },
-  itemNombre: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#0f172a',
-  },
-  itemCategoria: {
-    fontSize: 10,
-    color: '#64748b',
-    fontWeight: 'bold',
-  },
-  itemPrecio: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#16a34a',
-  },
-  notaCard: {
-    backgroundColor: '#fffbeb',
-    borderColor: '#fde68a',
-    borderWidth: 1,
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 10,
-  },
-  notaTitulo: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#b45309',
-  },
-  notaTexto: {
-    fontSize: 14,
-    color: '#78350f',
-    marginTop: 2,
-    fontStyle: 'italic',
-  },
-  btnNota: {
-    backgroundColor: '#f1f5f9',
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-  },
-  btnNotaText: {
-    color: '#2563eb',
-    fontSize: 13,
-    fontWeight: 'bold',
-  },
-  totalCard: {
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    marginBottom: 16,
-  },
-  totalLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-  },
-  totalValor: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#16a34a',
-  },
-  acciones: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 20,
-  },
-  btnLimpiar: {
-    backgroundColor: '#94a3b8',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  btnLimpiarText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  btnConfirmar: {
-    flex: 1,
-    backgroundColor: '#16a34a',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  btnConfirmarText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  cierre: {
+    gap: espacio.sm,
   },
 });

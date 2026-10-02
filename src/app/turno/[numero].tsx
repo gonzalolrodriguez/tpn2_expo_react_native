@@ -1,8 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useComedor } from '../../context/ComedorContext';
+import { Boton } from '../../components/Boton';
 import { DondeEstoy } from '../../components/DondeEstoy';
+import { EstadoVacio } from '../../components/EstadoVacio';
+import { FilaDato } from '../../components/FilaDato';
+import { Grupo } from '../../components/Grupo';
+import { Pantalla } from '../../components/Pantalla';
+import { colores, espacio, tipo } from '../../tema/tokens';
 
 export default function PantallaTurno() {
   const { numero } = useLocalSearchParams<{ numero: string }>();
@@ -16,16 +22,16 @@ export default function PantallaTurno() {
   // El parámetro llega de la URL: puede no ser un número o no corresponder a ningún pedido
   if (!Number.isInteger(numTurno) || numTurno < 1 || (!enCola && !atendido)) {
     return (
-      <View style={[styles.container, styles.content]}>
-        <View style={styles.cardTurno}>
-          <Text style={styles.labelTurno}>TURNO NO ENCONTRADO</Text>
-          <Text style={styles.estadoError}>No existe ningún pedido con el turno "{numero}".</Text>
-        </View>
-        <Pressable style={styles.btnVolver} onPress={() => router.replace('/')}>
-          <Text style={styles.btnText}>🏠 Volver al Inicio</Text>
-        </Pressable>
+      <Pantalla>
+        <EstadoVacio
+          icono="alert-circle-outline"
+          titulo="No encontramos ese turno"
+          mensaje={`No hay ningún pedido con el turno "${numero}". Revisá el número o hacé un pedido nuevo.`}
+        >
+          <Boton variante="secundario" titulo="Volver al inicio" onPress={() => router.replace('/')} />
+        </EstadoVacio>
         <DondeEstoy />
-      </View>
+      </Pantalla>
     );
   }
 
@@ -33,130 +39,66 @@ export default function PantallaTurno() {
 
   if (atendido) {
     return (
-      <View style={[styles.container, styles.content]}>
-        <View style={styles.cardTurno}>
-          <Text style={styles.labelTurno}>TURNO</Text>
-          <Text style={styles.numeroTurno}>#{numTurno}</Text>
-          <Text style={styles.estado}>🍽️ Tu pedido ya fue atendido. ¡Pasá a retirarlo!</Text>
+      <Pantalla>
+        <View style={styles.turno}>
+          {/* El número de turno es el único momento fuerte de la app */}
+          <Text selectable style={tipo.numero} accessibilityLabel={`Turno ${numTurno}`}>
+            #{numTurno}
+          </Text>
+          <Text style={[tipo.subtitulo, styles.centrado]}>Tu pedido está listo</Text>
+          <Text style={[tipo.cuerpo, styles.estado]}>La cocina ya lo atendió. Pasá a retirarlo.</Text>
         </View>
-        <Pressable style={styles.btnVolver} onPress={() => router.replace('/')}>
-          <Text style={styles.btnText}>🏠 Volver al Inicio</Text>
-        </Pressable>
+
+        <Boton variante="secundario" titulo="Volver al inicio" onPress={() => router.replace('/')} />
+
         <DondeEstoy />
-      </View>
+      </Pantalla>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.cardTurno}>
-        <Text style={styles.labelTurno}>SU NÚMERO DE TURNO ES</Text>
-        <Text style={styles.numeroTurno}>#{numTurno}</Text>
-        <Text style={styles.estado}>✅ Pedido ingresado en la cola de la cocina</Text>
-      </View>
-
-      <View style={styles.infoBox}>
-        <Text style={styles.infoTitulo}>📊 Estado en tiempo real:</Text>
-        <Text style={styles.infoTexto}>
-          • Pedidos adelante tuyo en la cola: <Text style={styles.bold}>{posicionAdelante}</Text>
+    <Pantalla>
+      <View style={styles.turno}>
+        {/* El número de turno es el único momento fuerte de la app */}
+        <Text selectable style={tipo.numero} accessibilityLabel={`Turno ${numTurno}`}>
+          #{numTurno}
         </Text>
-        <Text style={styles.infoTexto}>
-          • Tiempo estimado de espera: <Text style={styles.bold}>{tiempoEstimadoMinutos} minutos</Text> (aprox. 3 min por pedido)
+        <Text style={[tipo.subtitulo, styles.centrado]}>
+          {posicionAdelante === 0 ? 'Sos el próximo' : 'Tu pedido está en la cola'}
         </Text>
-        <Text style={styles.infoTexto}>
-          • Total de pedidos en preparación: <Text style={styles.bold}>{colaPedidosArray.length}</Text>
+        <Text style={[tipo.cuerpo, styles.estado]}>
+          La cocina atiende los pedidos por orden de llegada. Te avisamos acá cuando esté listo.
         </Text>
       </View>
 
-      <Pressable style={styles.btnVolver} onPress={() => router.replace('/')}>
-        <Text style={styles.btnText}>🏠 Volver al Inicio</Text>
-      </Pressable>
+      <Grupo>
+        <FilaDato titulo="Pedidos adelante tuyo" valor={String(posicionAdelante)} />
+        <FilaDato
+          titulo="Espera estimada"
+          detalle="Unos 3 minutos por pedido"
+          valor={`${tiempoEstimadoMinutos} min`}
+        />
+        <FilaDato titulo="Pedidos en la cola" valor={String(colaPedidosArray.length)} />
+      </Grupo>
+
+      <Boton variante="secundario" titulo="Volver al inicio" onPress={() => router.replace('/')} />
 
       <DondeEstoy />
-    </ScrollView>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  content: {
-    padding: 20,
+  turno: {
     alignItems: 'center',
+    gap: espacio.xs,
+    paddingVertical: espacio.xl,
   },
-  cardTurno: {
-    backgroundColor: '#ffffff',
-    padding: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-    width: '100%',
-    borderWidth: 2,
-    borderColor: '#2563eb',
-    marginBottom: 20,
-    elevation: 3,
-  },
-  labelTurno: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#64748b',
-    letterSpacing: 1,
-  },
-  numeroTurno: {
-    fontSize: 56,
-    fontWeight: 'bold',
-    color: '#2563eb',
-    marginVertical: 10,
+  centrado: {
+    textAlign: 'center',
   },
   estado: {
-    fontSize: 14,
-    color: '#16a34a',
-    fontWeight: 'bold',
     textAlign: 'center',
-  },
-  estadoError: {
-    fontSize: 14,
-    color: '#dc2626',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  infoBox: {
-    backgroundColor: '#e0f2fe',
-    borderColor: '#bae6fd',
-    borderWidth: 1,
-    padding: 16,
-    borderRadius: 12,
-    width: '100%',
-    marginBottom: 24,
-  },
-  infoTitulo: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#0369a1',
-    marginBottom: 8,
-  },
-  infoTexto: {
-    fontSize: 14,
-    color: '#0c4a6e',
-    marginBottom: 4,
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
-  btnVolver: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  btnText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: colores.tintaSecundaria,
   },
 });

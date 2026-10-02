@@ -1,10 +1,11 @@
 import React from 'react';
 import { Stack } from 'expo-router';
+import { opcionesHeader } from '../../../tema/tokens';
 
 export default function LayoutCarritoStack() {
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: '#2563eb' }, headerTintColor: '#fff' }}>
-      <Stack.Screen name="index" options={{ title: 'Mi Carrito de Compras' }} />
+    <Stack screenOptions={opcionesHeader}>
+      <Stack.Screen name="index" options={{ title: 'Carrito' }} />
       <Stack.Screen
         name="nota"
         options={{

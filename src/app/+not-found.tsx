@@ -1,69 +1,52 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { Link, usePathname, Stack } from 'expo-router';
+import { Boton } from '../components/Boton';
 import { DondeEstoy } from '../components/DondeEstoy';
+import { EstadoVacio } from '../components/EstadoVacio';
+import { Pantalla } from '../components/Pantalla';
+import { colores, espacio, radio, tipo } from '../tema/tokens';
 
 export default function PantallaNotFound() {
   const pathname = usePathname();
 
   return (
-    <View style={styles.container}>
+    <Pantalla>
       <Stack.Screen options={{ title: 'Error 404' }} />
 
-      <Text style={styles.icono}>🔍 404</Text>
-      <Text style={styles.titulo}>Pantalla no encontrada</Text>
-      <Text style={styles.subtitulo}>
-        La ruta ingresada <Text style={styles.path}>"{pathname}"</Text> no existe en esta aplicación.
-      </Text>
+      <EstadoVacio
+        icono="compass-outline"
+        titulo="Esta pantalla no existe"
+        mensaje="La dirección no corresponde a ninguna pantalla de la app. Revisala o volvé al inicio."
+      >
+        <View style={styles.accion}>
+          {/* La dirección se puede seleccionar para copiarla */}
+          <Text selectable style={[tipo.cuerpoFuerte, styles.ruta]}>
+            {pathname}
+          </Text>
 
-      <Link href="/" style={styles.btnInicio}>
-        <Text style={styles.btnText}>🏠 Ir al Inicio</Text>
-      </Link>
+          <Link href="/" asChild>
+            <Boton titulo="Ir al inicio" />
+          </Link>
+        </View>
+      </EstadoVacio>
 
       <DondeEstoy />
-    </View>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
+  accion: {
+    gap: espacio.lg,
   },
-  icono: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#ef4444',
-    marginBottom: 8,
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#0f172a',
-  },
-  subtitulo: {
-    fontSize: 14,
-    color: '#64748b',
+  ruta: {
     textAlign: 'center',
-    marginTop: 6,
-    marginBottom: 24,
-  },
-  path: {
-    fontWeight: 'bold',
-    color: '#dc2626',
-  },
-  btnInicio: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  btnText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
+    padding: espacio.md,
+    backgroundColor: colores.superficieHundida,
+    borderRadius: radio.control,
+    borderCurve: 'continuous',
+    // El texto recorta su fondo con las esquinas redondeadas
+    overflow: 'hidden',
   },
 });

@@ -1,126 +1,93 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { useLocalSearchParams, Stack } from 'expo-router';
-import { PLATOS } from '../../../data/platos';
+import { View, Text, StyleSheet } from 'react-native';
+import { useLocalSearchParams, Stack, Link } from 'expo-router';
+import { PLATOS, Plato } from '../../../data/platos';
 import { useComedor } from '../../../context/ComedorContext';
+import { Boton } from '../../../components/Boton';
 import { DondeEstoy } from '../../../components/DondeEstoy';
+import { EstadoVacio } from '../../../components/EstadoVacio';
+import { FilaDato } from '../../../components/FilaDato';
+import { Grupo } from '../../../components/Grupo';
+import { Pantalla } from '../../../components/Pantalla';
+import { colores, espacio, formatoPrecio, tipo } from '../../../tema/tokens';
+
+const NOMBRE_CATEGORIA: Record<Plato['categoria'], string> = {
+  desayuno: 'Desayuno',
+  almuerzo: 'Almuerzo',
+  bebidas: 'Bebidas',
+  kiosco: 'Kiosco',
+};
 
 export default function PantallaDetallePlato() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { agregarAlCarrito } = useComedor();
+  const { agregarAlCarrito, carrito } = useComedor();
 
   const idNumerico = Number(id);
   const plato = PLATOS.find((p) => p.id === idNumerico);
 
   if (!id || isNaN(idNumerico) || !plato) {
     return (
-      <View style={styles.errorContainer}>
+      <Pantalla>
         <Stack.Screen options={{ title: 'Plato no encontrado' }} />
-        <Text style={styles.errorText}>⚠️ El plato solicitado no existe o el ID es inválido ({id}).</Text>
+        <EstadoVacio
+          icono="alert-circle-outline"
+          titulo="Ese plato no existe"
+          mensaje={`No hay ningún plato con el código "${id}". Buscalo en el menú.`}
+        >
+          <Link href="/menu" asChild>
+            <Boton titulo="Ver el menú" />
+          </Link>
+        </EstadoVacio>
         <DondeEstoy />
-      </View>
+      </Pantalla>
     );
   }
 
+  const enCarrito = carrito.filter((item) => item.id === plato.id).length;
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <Pantalla>
       {/* Actualiza dinámicamente el título del header */}
       <Stack.Screen options={{ title: plato.nombre }} />
 
-      <View style={styles.badgeCategoria}>
-        <Text style={styles.textCategoria}>{plato.categoria.toUpperCase()}</Text>
+      {/* El header corta los nombres largos, por eso el nombre completo se repite acá */}
+      <View style={styles.encabezado}>
+        <Text style={tipo.titulo} accessibilityRole="header">
+          {plato.nombre}
+        </Text>
+        <Text style={[tipo.cuerpo, styles.descripcion]}>{plato.descripcion}</Text>
       </View>
 
-      <Text style={styles.nombre}>{plato.nombre}</Text>
-      <Text style={styles.precio}>${plato.precio.toLocaleString('es-AR')}</Text>
+      <Grupo>
+        <FilaDato titulo="Categoría" valor={NOMBRE_CATEGORIA[plato.categoria]} />
+        <FilaDato titulo="Precio" valor={formatoPrecio(plato.precio)} />
+      </Grupo>
 
-      <View style={styles.divider} />
-
-      <Text style={styles.label}>Descripción del plato:</Text>
-      <Text style={styles.descripcion}>{plato.descripcion}</Text>
-
-      <Pressable style={styles.btnAgregar} onPress={() => agregarAlCarrito(plato)}>
-        <Text style={styles.btnText}>🛒 Agregar al carrito</Text>
-      </Pressable>
+      <View style={styles.accion}>
+        <Boton icono="cart-outline" titulo="Agregar al carrito" onPress={() => agregarAlCarrito(plato)} />
+        {enCarrito > 0 ? (
+          <Text style={[tipo.nota, styles.confirmacion]} accessibilityLiveRegion="polite">
+            {enCarrito === 1 ? 'Ya tenés 1 en el carrito.' : `Ya tenés ${enCarrito} en el carrito.`}
+          </Text>
+        ) : null}
+      </View>
 
       <DondeEstoy />
-    </ScrollView>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  content: {
-    padding: 20,
-  },
-  errorContainer: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f8fafc',
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#dc2626',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  badgeCategoria: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#dbeafe',
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    marginBottom: 10,
-  },
-  textCategoria: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#1d4ed8',
-  },
-  nombre: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#0f172a',
-  },
-  precio: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#16a34a',
-    marginTop: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#e2e8f0',
-    marginVertical: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#475569',
-    marginBottom: 6,
+  encabezado: {
+    gap: espacio.sm,
   },
   descripcion: {
-    fontSize: 15,
-    color: '#334155',
-    lineHeight: 22,
-    marginBottom: 24,
+    color: colores.tintaSecundaria,
   },
-  btnAgregar: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 20,
+  accion: {
+    gap: espacio.sm,
   },
-  btnText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  confirmacion: {
+    textAlign: 'center',
   },
 });

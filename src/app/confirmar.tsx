@@ -1,8 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useComedor } from '../context/ComedorContext';
+import { Boton } from '../components/Boton';
 import { DondeEstoy } from '../components/DondeEstoy';
+import { EstadoVacio } from '../components/EstadoVacio';
+import { FilaDato } from '../components/FilaDato';
+import { Grupo } from '../components/Grupo';
+import { NotaCocina } from '../components/NotaCocina';
+import { Pantalla } from '../components/Pantalla';
+import { espacio, formatoPrecio, tipo } from '../tema/tokens';
 
 export default function PantallaConfirmar() {
   const { carrito, totalCarrito, notaCarrito, confirmarPedido } = useComedor();
@@ -17,183 +24,46 @@ export default function PantallaConfirmar() {
 
   if (carrito.length === 0) {
     return (
-      <View style={styles.vacioContainer}>
-        <Text style={styles.vacioText}>No hay productos en el carrito para confirmar.</Text>
-        <Pressable style={styles.btnVolver} onPress={() => router.back()}>
-          <Text style={styles.btnVolverText}>Volver al carrito</Text>
-        </Pressable>
+      <Pantalla>
+        <EstadoVacio
+          icono="cart-outline"
+          titulo="No hay nada para confirmar"
+          mensaje="Tu carrito está vacío. Agregá al menos un plato antes de confirmar el pedido."
+        >
+          <Boton variante="secundario" titulo="Volver al carrito" onPress={() => router.back()} />
+        </EstadoVacio>
         <DondeEstoy />
-      </View>
+      </Pantalla>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.titulo}>📋 Resumen del Pedido</Text>
-
-      <View style={styles.cardResumen}>
-        <Text style={styles.secTitulo}>Productos seleccionados:</Text>
+    <Pantalla>
+      <Grupo>
         {carrito.map((item, i) => (
-          <View key={`${item.id}-${i}`} style={styles.row}>
-            <Text style={styles.itemNombre}>{item.nombre}</Text>
-            <Text style={styles.itemPrecio}>${item.precio.toLocaleString('es-AR')}</Text>
-          </View>
+          <FilaDato key={`${item.id}-${i}`} titulo={item.nombre} valor={formatoPrecio(item.precio)} />
         ))}
+        <FilaDato fuerte titulo="Total a pagar" valor={formatoPrecio(totalCarrito)} />
+      </Grupo>
 
-        {notaCarrito ? (
-          <View style={styles.notaBox}>
-            <Text style={styles.notaLabel}>Aclaración para cocina:</Text>
-            <Text style={styles.notaValue}>"{notaCarrito}"</Text>
-          </View>
-        ) : null}
+      {notaCarrito ? <NotaCocina nota={notaCarrito} /> : null}
 
-        <View style={styles.divider} />
-
-        <View style={styles.rowTotal}>
-          <Text style={styles.totalLabel}>TOTAL A PAGAR:</Text>
-          <Text style={styles.totalValor}>${totalCarrito.toLocaleString('es-AR')}</Text>
-        </View>
-      </View>
-
-      <Text style={styles.aviso}>
-        Al hacer clic en "Confirmar", tu pedido ingresará en la **Cola de la Cocina** y se te asignará un número de turno correlativo.
+      <Text style={tipo.nota}>
+        Al confirmar, tu pedido entra en la cola de la cocina y te asignamos un número de turno.
       </Text>
 
-      <Pressable style={styles.btnConfirmar} onPress={handleConfirmar}>
-        <Text style={styles.btnConfirmarText}>🚀 Enviar a Cocina y Generar Turno</Text>
-      </Pressable>
-
-      <Pressable style={styles.btnCancelar} onPress={() => router.back()}>
-        <Text style={styles.btnCancelarText}>Cancelar</Text>
-      </Pressable>
+      <View style={styles.acciones}>
+        <Boton titulo="Enviar a la cocina" onPress={handleConfirmar} />
+        <Boton variante="texto" titulo="Cancelar" onPress={() => router.back()} />
+      </View>
 
       <DondeEstoy />
-    </ScrollView>
+    </Pantalla>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  content: {
-    padding: 20,
-  },
-  vacioContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  vacioText: {
-    fontSize: 16,
-    color: '#64748b',
-    marginBottom: 16,
-  },
-  btnVolver: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  btnVolverText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 16,
-  },
-  cardResumen: {
-    backgroundColor: '#f8fafc',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    marginBottom: 16,
-  },
-  secTitulo: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#334155',
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  itemNombre: {
-    fontSize: 14,
-    color: '#1e293b',
-  },
-  itemPrecio: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#16a34a',
-  },
-  notaBox: {
-    backgroundColor: '#fffbeb',
-    padding: 8,
-    borderRadius: 6,
-    marginTop: 8,
-  },
-  notaLabel: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#b45309',
-  },
-  notaValue: {
-    fontSize: 12,
-    color: '#78350f',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#cbd5e1',
-    marginVertical: 12,
-  },
-  rowTotal: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  totalLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#0f172a',
-  },
-  totalValor: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#16a34a',
-  },
-  aviso: {
-    fontSize: 12,
-    color: '#64748b',
-    marginBottom: 20,
-    lineHeight: 18,
-  },
-  btnConfirmar: {
-    backgroundColor: '#16a34a',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  btnConfirmarText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  btnCancelar: {
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  btnCancelarText: {
-    color: '#ef4444',
-    fontWeight: 'bold',
+  acciones: {
+    gap: espacio.sm,
   },
 });

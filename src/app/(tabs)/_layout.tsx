@@ -2,18 +2,25 @@ import React from 'react';
 import { Tabs } from 'expo-router/js-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useComedor } from '../../context/ComedorContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colores, espacio } from '../../tema/tokens';
+
+// Alto de la barra de pestañas sin contar el margen inferior seguro
+const ALTO_BARRA = 60;
 
 export default function LayoutTabs() {
   const { carrito, usuario, colaPedidosArray } = useComedor();
   const conSesion = usuario !== null;
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#2563eb',
-        tabBarInactiveTintColor: '#64748b',
-        tabBarStyle: { paddingBottom: 6, paddingTop: 6, height: 60 },
+        tabBarActiveTintColor: colores.marca,
+        tabBarInactiveTintColor: colores.tintaSecundaria,
+        // Alto suficiente para ícono + etiqueta, más el margen inferior seguro del dispositivo
+        tabBarStyle: { height: ALTO_BARRA + insets.bottom, paddingTop: espacio.xs },
       }}
     >
       <Tabs.Screen

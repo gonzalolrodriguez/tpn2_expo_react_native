@@ -2,7 +2,8 @@ import React from 'react';
 import { Drawer } from 'expo-router/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import { useComedor } from '../../context/ComedorContext';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Boton } from '../../components/Boton';
+import { colores, opcionesHeader } from '../../tema/tokens';
 
 export default function LayoutCocinaDrawer() {
   const { cerrarSesion } = useComedor();
@@ -10,47 +11,31 @@ export default function LayoutCocinaDrawer() {
   return (
     <Drawer
       screenOptions={{
-        headerStyle: { backgroundColor: '#16a34a' },
-        headerTintColor: '#ffffff',
-        drawerActiveTintColor: '#16a34a',
+        ...opcionesHeader,
+        drawerActiveTintColor: colores.marca,
+        drawerInactiveTintColor: colores.tintaSecundaria,
+        // Botón de texto con ícono: conserva el área táctil mínima de 48 px
         headerRight: () => (
-          <Pressable style={styles.btnLogout} onPress={cerrarSesion}>
-            <Text style={styles.btnLogoutText}>Cerrar Sesión 🚪</Text>
-          </Pressable>
+          <Boton variante="texto" icono="log-out-outline" titulo="Cerrar sesión" onPress={cerrarSesion} />
         ),
       }}
     >
       <Drawer.Screen
         name="index"
         options={{
-          title: 'Pedidos en Cola',
-          drawerLabel: 'Pedidos Activos',
-          drawerIcon: ({ color, size }) => <Ionicons name="list" size={size} color={color} />,
+          title: 'Pedidos en cola',
+          drawerLabel: 'Pedidos en cola',
+          drawerIcon: ({ color, size }) => <Ionicons name="list-outline" size={size} color={color} />,
         }}
       />
       <Drawer.Screen
         name="atendidos"
         options={{
-          title: 'Historial de Atendidos',
-          drawerLabel: 'Pedidos Atendidos (Pila)',
-          drawerIcon: ({ color, size }) => <Ionicons name="checkmark-done" size={size} color={color} />,
+          title: 'Pedidos atendidos',
+          drawerLabel: 'Pedidos atendidos',
+          drawerIcon: ({ color, size }) => <Ionicons name="checkmark-done-outline" size={size} color={color} />,
         }}
       />
     </Drawer>
   );
 }
-
-const styles = StyleSheet.create({
-  btnLogout: {
-    marginRight: 12,
-    backgroundColor: '#15803d',
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-  },
-  btnLogoutText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-});
