@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { useComedor } from '../context/ComedorContext';
 import { Boton } from '../components/Boton';
 import { Campo } from '../components/Campo';
 import { DondeEstoy } from '../components/DondeEstoy';
+import { LogoInstituto } from '../components/Marca';
 import { Pantalla } from '../components/Pantalla';
 import { colores, tipo } from '../tema/tokens';
 
@@ -22,7 +23,12 @@ export default function PantallaLogin() {
   };
 
   return (
-    <Pantalla>
+    <Pantalla variante="lectura">
+      {/* Logo horizontal del instituto: lleva texto oscuro, por eso va sobre el fondo claro */}
+      <View style={styles.logo}>
+        <LogoInstituto />
+      </View>
+
       <Text style={[tipo.cuerpo, styles.intro]}>
         Ingresá con la cuenta del personal para atender los pedidos en cola.
       </Text>
@@ -61,6 +67,9 @@ export default function PantallaLogin() {
 }
 
 const styles = StyleSheet.create({
+  logo: {
+    alignItems: 'center',
+  },
   intro: {
     color: colores.tintaSecundaria,
   },

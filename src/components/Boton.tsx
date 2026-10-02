@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, ViewStyle, StyleSheet, PressableProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Presionable } from './Presionable';
-import { colores, espacio, radio, tipo, TOQUE_MINIMO } from '../tema/tokens';
+import { colores, diseno, espacio, radio, tamanioIcono, tipo, TOQUE_MINIMO } from '../tema/tokens';
 
 type Variante = 'primario' | 'secundario' | 'peligro' | 'texto';
 
@@ -28,11 +28,12 @@ export const Boton = React.forwardRef<View, Props>(
       accessibilityRole="button"
       accessibilityLabel={titulo}
       accessibilityState={{ disabled: !!resto.disabled }}
-      contenedor={contenedor}
+      // En escritorio un botón no cruza toda la página: como mucho mide lo que una columna de lectura
+      contenedor={{ maxWidth: diseno.anchoLectura, ...contenedor }}
       estilo={[styles.base, styles[variante]]}
       {...resto}
     >
-      {icono ? <Ionicons name={icono} size={20} color={COLOR_TEXTO[variante]} /> : null}
+      {icono ? <Ionicons name={icono} size={tamanioIcono.md} color={COLOR_TEXTO[variante]} /> : null}
       <Text style={[tipo.cuerpoFuerte, { color: COLOR_TEXTO[variante] }]}>{titulo}</Text>
     </Presionable>
   ),

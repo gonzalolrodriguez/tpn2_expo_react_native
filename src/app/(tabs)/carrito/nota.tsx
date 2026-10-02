@@ -16,7 +16,7 @@ export default function PantallaNotaCarrito() {
   };
 
   return (
-    <Pantalla>
+    <Pantalla variante="lectura">
       <Campo
         etiqueta="Aclaración para tu pedido"
         ayuda="Por ejemplo: sin sal, mayonesa aparte o bien cocido."

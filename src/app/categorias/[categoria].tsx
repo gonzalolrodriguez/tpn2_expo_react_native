@@ -5,9 +5,8 @@ import { PLATOS } from '../../data/platos';
 import { Boton } from '../../components/Boton';
 import { DondeEstoy } from '../../components/DondeEstoy';
 import { EstadoVacio } from '../../components/EstadoVacio';
-import { Grupo } from '../../components/Grupo';
 import { Pantalla } from '../../components/Pantalla';
-import { TarjetaPlato } from '../../components/TarjetaPlato';
+import { RejillaPlatos } from '../../components/RejillaPlatos';
 import { espacio, tipo } from '../../tema/tokens';
 
 const CATEGORIAS_VALIDAS = ['desayuno', 'almuerzo', 'bebidas', 'kiosco'];
@@ -40,7 +39,7 @@ export default function PantallaCategoria() {
   const tituloFormatted = catNormalizada.charAt(0).toUpperCase() + catNormalizada.slice(1);
 
   return (
-    <Pantalla>
+    <Pantalla conBarraCarrito>
       {/* El nombre de la categoría ya está en el header: no se repite en la página */}
       <Stack.Screen options={{ title: tituloFormatted }} />
 
@@ -48,11 +47,7 @@ export default function PantallaCategoria() {
         {platosFiltrados.length === 1 ? '1 opción disponible' : `${platosFiltrados.length} opciones disponibles`}
       </Text>
 
-      <Grupo>
-        {platosFiltrados.map((plato) => (
-          <TarjetaPlato key={plato.id} plato={plato} />
-        ))}
-      </Grupo>
+      <RejillaPlatos platos={platosFiltrados} />
 
       <DondeEstoy />
     </Pantalla>
@@ -62,7 +57,7 @@ export default function PantallaCategoria() {
 const styles = StyleSheet.create({
   cantidad: {
     fontVariant: ['tabular-nums'],
-    // El contador pertenece a la lista: se acerca a ella
+    // El contador pertenece a la rejilla: se acerca a ella
     marginBottom: -espacio.sm,
   },
 });

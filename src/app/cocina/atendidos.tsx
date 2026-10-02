@@ -46,7 +46,12 @@ export default function PantallaAtendidos() {
 
               <Grupo>
                 {pedido.items.map((item, i) => (
-                  <FilaDato key={`${item.id}-${i}`} titulo={item.nombre} valor={formatoPrecio(item.precio)} />
+                  <FilaDato
+                    key={`${item.id}-${i}`}
+                    miniatura={item}
+                    titulo={item.nombre}
+                    valor={formatoPrecio(item.precio)}
+                  />
                 ))}
                 <FilaDato fuerte titulo="Total cobrado" valor={formatoPrecio(pedido.total)} />
               </Grupo>

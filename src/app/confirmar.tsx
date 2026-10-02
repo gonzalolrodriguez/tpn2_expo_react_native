@@ -24,7 +24,7 @@ export default function PantallaConfirmar() {
 
   if (carrito.length === 0) {
     return (
-      <Pantalla>
+      <Pantalla variante="lectura">
         <EstadoVacio
           icono="cart-outline"
           titulo="No hay nada para confirmar"
@@ -38,10 +38,10 @@ export default function PantallaConfirmar() {
   }
 
   return (
-    <Pantalla>
+    <Pantalla variante="lectura">
       <Grupo>
         {carrito.map((item, i) => (
-          <FilaDato key={`${item.id}-${i}`} titulo={item.nombre} valor={formatoPrecio(item.precio)} />
+          <FilaDato key={`${item.id}-${i}`} miniatura={item} titulo={item.nombre} valor={formatoPrecio(item.precio)} />
         ))}
         <FilaDato fuerte titulo="Total a pagar" valor={formatoPrecio(totalCarrito)} />
       </Grupo>

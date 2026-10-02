@@ -1,15 +1,31 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
+import Animated from 'react-native-reanimated';
 import { useComedor } from '../../../context/ComedorContext';
 import { Boton } from '../../../components/Boton';
 import { DondeEstoy } from '../../../components/DondeEstoy';
 import { EstadoVacio } from '../../../components/EstadoVacio';
 import { FilaDato } from '../../../components/FilaDato';
 import { Grupo } from '../../../components/Grupo';
+import { APARECER, DESAPARECER, REACOMODAR, vibrarLeve } from '../../../components/Movimiento';
 import { NotaCocina } from '../../../components/NotaCocina';
 import { Pantalla } from '../../../components/Pantalla';
+import { Plato } from '../../../data/platos';
 import { espacio, formatoPrecio } from '../../../tema/tokens';
+
+// Le da a cada ítem una clave estable: el código del plato más cuántas veces apareció antes.
+// "Deshacer último" quita la última aparición de un plato, así que la clave que desaparece
+// es justo la de la fila que se va, y es esa la que se anima al salir.
+function conClaves(carrito: Plato[]) {
+  const vistos = new Map<number, number>();
+
+  return carrito.map((item) => {
+    const repeticion = vistos.get(item.id) ?? 0;
+    vistos.set(item.id, repeticion + 1);
+    return { item, clave: `${item.id}-${repeticion}` };
+  });
+}
 
 export default function PantallaCarrito() {
   const {
@@ -23,6 +39,12 @@ export default function PantallaCarrito() {
 
   const esPilaVacia = pilaDeshacerTamanio === 0;
   const carritoVacio = carrito.length === 0;
+
+  const alDeshacer = () => {
+    // Un toque leve junto con la fila que se va de la lista
+    vibrarLeve();
+    deshacerUltimo();
+  };
 
   return (
     <Pantalla>
@@ -38,31 +60,40 @@ export default function PantallaCarrito() {
         </EstadoVacio>
       ) : (
         <Grupo>
-          {carrito.map((item, index) => (
-            <FilaDato key={`${item.id}-${index}`} titulo={item.nombre} valor={formatoPrecio(item.precio)} />
+          {/* Cada fila aparece y se va con un fundido; las que quedan se reacomodan */}
+          {conClaves(carrito).map(({ item, clave }) => (
+            <Animated.View key={clave} entering={APARECER} exiting={DESAPARECER} layout={REACOMODAR}>
+              <FilaDato miniatura={item} titulo={item.nombre} valor={formatoPrecio(item.precio)} />
+            </Animated.View>
           ))}
-          <FilaDato fuerte titulo="Total" valor={formatoPrecio(totalCarrito)} />
+          <Animated.View key="total" layout={REACOMODAR}>
+            <FilaDato fuerte titulo="Total" valor={formatoPrecio(totalCarrito)} />
+          </Animated.View>
         </Grupo>
       )}
 
       {/* Deshacer usa la Pila: siempre visible, deshabilitado cuando la pila está vacía */}
-      <View style={styles.edicion}>
+      <Animated.View layout={REACOMODAR} style={styles.edicion}>
         <Boton
           variante="secundario"
           icono="arrow-undo-outline"
           titulo={`Deshacer último (${pilaDeshacerTamanio})`}
-          onPress={deshacerUltimo}
+          onPress={alDeshacer}
           disabled={esPilaVacia}
           contenedor={styles.deshacer}
         />
         {carritoVacio ? null : <Boton variante="peligro" titulo="Vaciar" onPress={limpiarCarrito} />}
-      </View>
+      </Animated.View>
 
       {carritoVacio ? null : (
         <>
-          {notaCarrito !== '' ? <NotaCocina nota={notaCarrito} /> : null}
+          {notaCarrito !== '' ? (
+            <Animated.View layout={REACOMODAR}>
+              <NotaCocina nota={notaCarrito} />
+            </Animated.View>
+          ) : null}
 
-          <View style={styles.cierre}>
+          <Animated.View layout={REACOMODAR} style={styles.cierre}>
             <Link href="/carrito/nota" asChild>
               <Boton
                 variante="texto"
@@ -75,7 +106,7 @@ export default function PantallaCarrito() {
             <Link href="/confirmar" asChild>
               <Boton titulo="Confirmar pedido" />
             </Link>
-          </View>
+          </Animated.View>
         </>
       )}
 

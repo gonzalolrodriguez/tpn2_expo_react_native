@@ -3,7 +3,8 @@ import { Tabs } from 'expo-router/js-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useComedor } from '../../context/ComedorContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colores, espacio } from '../../tema/tokens';
+import { useDiseno } from '../../components/Diseno';
+import { colores, diseno, espacio } from '../../tema/tokens';
 
 // Alto de la barra de pestañas sin contar el margen inferior seguro
 const ALTO_BARRA = 60;
@@ -12,15 +13,25 @@ export default function LayoutTabs() {
   const { carrito, usuario, colaPedidosArray } = useComedor();
   const conSesion = usuario !== null;
   const insets = useSafeAreaInsets();
+  // En escritorio las pestañas pasan a ser una barra lateral: aprovecha el ancho y deja el alto para el contenido
+  const { esEscritorio } = useDiseno();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        // Las pestañas son pares, no niveles: se cambia de una a otra sin animación
+        animation: 'none',
+        tabBarPosition: esEscritorio ? 'left' : 'bottom',
         tabBarActiveTintColor: colores.marca,
         tabBarInactiveTintColor: colores.tintaSecundaria,
+        // La pestaña activa de la barra lateral se marca con el verde suave de la marca
+        tabBarActiveBackgroundColor: esEscritorio ? colores.marcaSuave : undefined,
         // Alto suficiente para ícono + etiqueta, más el margen inferior seguro del dispositivo
-        tabBarStyle: { height: ALTO_BARRA + insets.bottom, paddingTop: espacio.xs },
+        // (solo en la barra inferior; la lateral tiene ancho fijo para dejarle lugar al contenido)
+        tabBarStyle: esEscritorio
+          ? { minWidth: diseno.barraLateral, width: diseno.barraLateral, paddingTop: espacio.lg }
+          : { height: ALTO_BARRA + insets.bottom, paddingTop: espacio.xs },
       }}
     >
       <Tabs.Screen

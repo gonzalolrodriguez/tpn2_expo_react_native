@@ -47,7 +47,8 @@ src/
 │   ├── TarjetaPlato.tsx                -> Componente reutilizable para platos
 │   └── TituloConPila.tsx               -> Título de header con el contador de pantallas en la pila (useNavigation().getState())
 │   (más los componentes de interfaz compartidos: Pantalla, Boton, Presionable, Grupo, FilaEnlace,
-│    FilaDato, Campo, Chip, NotaCocina y EstadoVacio)
+│    FilaDato, Campo, Chip, NotaCocina, EstadoVacio, ImagenPlato, RejillaPlatos, TarjetaFoto, Carrusel,
+│    HeroMarca, Marca, BotonAgregar, BarraCarrito, TicketTurno, Movimiento y Diseno)
 ├── tema/
 │   └── tokens.ts                       -> Sistema de diseño: colores, espaciado, tipografía, radios y sombras
 ├── context/
@@ -86,7 +87,11 @@ Usuario de prueba: `cocina` / `1234`.
 
 Todos los valores visuales salen de `src/tema/tokens.ts`; las pantallas no escriben colores ni tamaños a mano.
 
-* **Un solo color de acción** (verde yerba) para lo que se puede tocar; ámbar para la nota de cocina y rojo para errores o acciones destructivas.
+* **Identidad del Instituto Politécnico Formosa:** el escudo aparece en el inicio, en el login y en el ícono de la app. La paleta sale del escudo y del sitio institucional: verde `#078654`, verde oscuro `#08383F`, verde mar `#074D59` y crema `#E5EEE7`.
+* **Un solo color de acción** (el verde del escudo) para lo que se puede tocar; ámbar para la nota de cocina y rojo para errores o acciones destructivas.
+* **Platos con foto** (`expo-image`), en una grilla de 1, 2 o 3 columnas según el ancho de la pantalla.
+* **Adaptable a escritorio y celular:** el contenido se centra con un ancho máximo y, en pantallas grandes, las pestañas pasan a ser una barra lateral.
+* **Animaciones con Reanimated:** respuesta al toque, entrada escalonada de las tarjetas, barra flotante del carrito y ticket de turno con resorte. Respetan la opción "reducir movimiento" del sistema. En el celular se suma vibración háptica (`expo-haptics`).
 * **Listas agrupadas** (`Grupo`) con filas separadas por líneas finas, en lugar de una tarjeta por elemento.
 * **Áreas táctiles de 48 px** como mínimo y respuesta visual al apoyar el dedo (`Presionable`, `Boton`).
 * **Íconos de `@expo/vector-icons`** (Ionicons) en toda la app; no se usan emojis como íconos.
@@ -141,6 +146,13 @@ Gracias a `unstable_settings = { anchor: '(tabs)' }` en el layout raíz, abrir u
    ```bash
    npm run typecheck
    ```
+
+---
+
+## Créditos
+
+* **Logo y escudo:** Instituto Politécnico Formosa (`assets/escudo-ipf.png`, `assets/logo-ipf.png`).
+* **Fotos de los platos:** Wikimedia Commons, con autor y licencia de cada una en `assets/platos/CREDITOS.md`.
 
 ---
 

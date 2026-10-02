@@ -12,8 +12,9 @@ interface Props extends Omit<PressableProps, 'style' | 'children'> {
 
 // Fila de navegación para usar dentro de <Grupo>: ícono, título, descripción y chevron.
 // Está pensada como hijo de <Link asChild>, que le agrega el destino y el rol de enlace.
+// Al tocarla se resalta el fondo: es una fila de ancho completo, no se achica como un botón.
 export const FilaEnlace = React.forwardRef<View, Props>(({ icono, titulo, descripcion, ...resto }, ref) => (
-  <Presionable ref={ref} estilo={styles.fila} {...resto}>
+  <Presionable ref={ref} respuesta="resaltado" estilo={styles.fila} {...resto}>
     <Ionicons name={icono} size={tamanioIcono.lg} color={colores.marca} />
     <View style={styles.textos}>
       <Text style={tipo.cuerpoFuerte}>{titulo}</Text>

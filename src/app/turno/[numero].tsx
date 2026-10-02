@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useComedor } from '../../context/ComedorContext';
 import { Boton } from '../../components/Boton';
@@ -8,7 +7,7 @@ import { EstadoVacio } from '../../components/EstadoVacio';
 import { FilaDato } from '../../components/FilaDato';
 import { Grupo } from '../../components/Grupo';
 import { Pantalla } from '../../components/Pantalla';
-import { colores, espacio, tipo } from '../../tema/tokens';
+import { TicketTurno } from '../../components/TicketTurno';
 
 export default function PantallaTurno() {
   const { numero } = useLocalSearchParams<{ numero: string }>();
@@ -22,7 +21,7 @@ export default function PantallaTurno() {
   // El parámetro llega de la URL: puede no ser un número o no corresponder a ningún pedido
   if (!Number.isInteger(numTurno) || numTurno < 1 || (!enCola && !atendido)) {
     return (
-      <Pantalla>
+      <Pantalla variante="lectura">
         <EstadoVacio
           icono="alert-circle-outline"
           titulo="No encontramos ese turno"
@@ -39,15 +38,12 @@ export default function PantallaTurno() {
 
   if (atendido) {
     return (
-      <Pantalla>
-        <View style={styles.turno}>
-          {/* El número de turno es el único momento fuerte de la app */}
-          <Text selectable style={tipo.numero} accessibilityLabel={`Turno ${numTurno}`}>
-            #{numTurno}
-          </Text>
-          <Text style={[tipo.subtitulo, styles.centrado]}>Tu pedido está listo</Text>
-          <Text style={[tipo.cuerpo, styles.estado]}>La cocina ya lo atendió. Pasá a retirarlo.</Text>
-        </View>
+      <Pantalla variante="lectura">
+        <TicketTurno
+          numero={numTurno}
+          titulo="Tu pedido está listo"
+          mensaje="La cocina ya lo atendió. Pasá a retirarlo."
+        />
 
         <Boton variante="secundario" titulo="Volver al inicio" onPress={() => router.replace('/')} />
 
@@ -57,19 +53,14 @@ export default function PantallaTurno() {
   }
 
   return (
-    <Pantalla>
-      <View style={styles.turno}>
-        {/* El número de turno es el único momento fuerte de la app */}
-        <Text selectable style={tipo.numero} accessibilityLabel={`Turno ${numTurno}`}>
-          #{numTurno}
-        </Text>
-        <Text style={[tipo.subtitulo, styles.centrado]}>
-          {posicionAdelante === 0 ? 'Sos el próximo' : 'Tu pedido está en la cola'}
-        </Text>
-        <Text style={[tipo.cuerpo, styles.estado]}>
-          La cocina atiende los pedidos por orden de llegada. Te avisamos acá cuando esté listo.
-        </Text>
-      </View>
+    <Pantalla variante="lectura">
+      {/* El número de turno es el único momento fuerte de la app: llega con rebote y aviso de éxito */}
+      <TicketTurno
+        celebrar
+        numero={numTurno}
+        titulo={posicionAdelante === 0 ? 'Sos el próximo' : 'Tu pedido está en la cola'}
+        mensaje="La cocina atiende los pedidos por orden de llegada. Te avisamos acá cuando esté listo."
+      />
 
       <Grupo>
         <FilaDato titulo="Pedidos adelante tuyo" valor={String(posicionAdelante)} />
@@ -87,18 +78,3 @@ export default function PantallaTurno() {
     </Pantalla>
   );
 }
-
-const styles = StyleSheet.create({
-  turno: {
-    alignItems: 'center',
-    gap: espacio.xs,
-    paddingVertical: espacio.xl,
-  },
-  centrado: {
-    textAlign: 'center',
-  },
-  estado: {
-    textAlign: 'center',
-    color: colores.tintaSecundaria,
-  },
-});

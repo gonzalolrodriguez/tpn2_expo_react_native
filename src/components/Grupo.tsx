@@ -15,7 +15,8 @@ export const Grupo: React.FC<Props> = ({ children, estilo }) => {
   return (
     <View style={[styles.grupo, estilo]}>
       {filas.map((hijo, indice) => (
-        <React.Fragment key={indice}>
+        // Se conserva la key de cada fila: así una fila que se quita de la lista es la que se anima al salir
+        <React.Fragment key={React.isValidElement(hijo) && hijo.key != null ? hijo.key : indice}>
           {indice > 0 ? <View style={styles.separador} /> : null}
           {hijo}
         </React.Fragment>

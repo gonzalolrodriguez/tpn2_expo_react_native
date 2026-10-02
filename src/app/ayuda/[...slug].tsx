@@ -14,7 +14,7 @@ export default function PantallaAyudaCatchAll() {
   const pathCompleto = segmentos.join('/');
 
   return (
-    <Pantalla>
+    <Pantalla variante="lectura">
       <Stack.Screen options={{ title: `Ayuda: ${slug?.[slug.length - 1] || 'Artículo'}` }} />
 
       <Text selectable style={tipo.titulo} accessibilityRole="header">

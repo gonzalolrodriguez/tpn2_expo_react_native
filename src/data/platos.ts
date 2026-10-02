@@ -4,7 +4,8 @@ export interface Plato {
   descripcion: string;
   precio: number;
   categoria: 'desayuno' | 'almuerzo' | 'bebidas' | 'kiosco';
-  imagen?: string;
+  // Foto del plato: recurso local (require devuelve el identificador del recurso)
+  imagen: number;
 }
 
 export const PLATOS: Plato[] = [
@@ -15,6 +16,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Café artesanal pasado con leche y dos medialunas recién horneadas.',
     precio: 2500,
     categoria: 'desayuno',
+    imagen: require('../../assets/platos/cafe-medialunas.jpg'),
   },
   {
     id: 2,
@@ -22,6 +24,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Pan de miga tostado crocante relleno de jamón cocido y queso muzzarella.',
     precio: 3200,
     categoria: 'desayuno',
+    imagen: require('../../assets/platos/tostado.jpg'),
   },
   {
     id: 3,
@@ -29,6 +32,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Porción de 3 chipás tradicionales bien calentitos hechos con almidón de mandioca y queso.',
     precio: 1800,
     categoria: 'desayuno',
+    imagen: require('../../assets/platos/chipa.jpg'),
   },
   // Almuerzo
   {
@@ -37,6 +41,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Milanesa de carne vacuna crocante acompañada con papas fritas doradas.',
     precio: 5500,
     categoria: 'almuerzo',
+    imagen: require('../../assets/platos/milanesa.jpg'),
   },
   {
     id: 5,
@@ -44,6 +49,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Empanadas cortadas a cuchillo, bien jugosas con condimento autóctono.',
     precio: 3600,
     categoria: 'almuerzo',
+    imagen: require('../../assets/platos/empanadas.jpg'),
   },
   {
     id: 6,
@@ -51,6 +57,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Plato abundante de guiso casero con panceta, chorizo colorado y verduras.',
     precio: 4800,
     categoria: 'almuerzo',
+    imagen: require('../../assets/platos/guiso-lentejas.jpg'),
   },
   {
     id: 7,
@@ -58,6 +65,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Hamburguesa casera de 180g con lechuga, tomate, jamón, queso y huevo frito.',
     precio: 5200,
     categoria: 'almuerzo',
+    imagen: require('../../assets/platos/hamburguesa.jpg'),
   },
   // Bebidas
   {
@@ -66,6 +74,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Refrescante limonada natural preparada al momento.',
     precio: 1900,
     categoria: 'bebidas',
+    imagen: require('../../assets/platos/limonada.jpg'),
   },
   {
     id: 9,
@@ -73,6 +82,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Línea Coca-Cola, Sprite o Fanta bien helada.',
     precio: 1800,
     categoria: 'bebidas',
+    imagen: require('../../assets/platos/gaseosa.jpg'),
   },
   {
     id: 10,
@@ -80,6 +90,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Agua mineral de manantial fresca.',
     precio: 1200,
     categoria: 'bebidas',
+    imagen: require('../../assets/platos/agua.jpg'),
   },
   // Kiosco
   {
@@ -88,6 +99,7 @@ export const PLATOS: Plato[] = [
     descripcion: 'Alfajor suave bañado en chocolate negro relleno de abundante dulce de leche.',
     precio: 1500,
     categoria: 'kiosco',
+    imagen: require('../../assets/platos/alfajor.jpg'),
   },
   {
     id: 12,
@@ -95,5 +107,6 @@ export const PLATOS: Plato[] = [
     descripcion: 'Snack saludable para recargar energías entre clases.',
     precio: 1100,
     categoria: 'kiosco',
+    imagen: require('../../assets/platos/barra-cereal.jpg'),
   },
 ];

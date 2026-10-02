@@ -11,7 +11,7 @@ export default function PantallaNotFound() {
   const pathname = usePathname();
 
   return (
-    <Pantalla>
+    <Pantalla variante="lectura">
       <Stack.Screen options={{ title: 'Error 404' }} />
 
       <EstadoVacio

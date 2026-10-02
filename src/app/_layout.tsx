@@ -1,5 +1,6 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ComedorProvider, useComedor } from '../context/ComedorContext';
 import { TituloConPila } from '../components/TituloConPila';
@@ -13,42 +14,49 @@ function NavegacionRaiz() {
   const { usuario } = useComedor();
   const conSesion = usuario !== null;
 
+  // El inicio tiene el bloque de marca oscuro debajo de la barra de estado: ahí los íconos van claros.
+  // En el resto de la app los headers son blancos y los íconos van oscuros.
+  const enInicio = usePathname() === '/';
+
   return (
-    <Stack
-      screenOptions={{
-        ...opcionesHeader,
-        // Desafío opcional: el título muestra cuántas pantallas hay en la pila
-        headerTitle: (props) => <TituloConPila {...props} />,
-      }}
-    >
-      {/* Pestañas principales */}
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <>
+      <StatusBar style={enInicio ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          ...opcionesHeader,
+          // Desafío opcional: el título muestra cuántas pantallas hay en la pila
+          headerTitle: (props) => <TituloConPila {...props} />,
+        }}
+      >
+        {/* Pestañas principales */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-      {/* Rutas dinámicas en el Stack raíz */}
-      <Stack.Screen name="categorias/[categoria]" options={{ title: 'Categoría' }} />
-      <Stack.Screen name="buscar" options={{ title: 'Buscar platos' }} />
+        {/* Rutas dinámicas en el Stack raíz */}
+        <Stack.Screen name="categorias/[categoria]" options={{ title: 'Categoría' }} />
+        <Stack.Screen name="buscar" options={{ title: 'Buscar platos' }} />
 
-      {/* Flujo de pedido */}
-      <Stack.Screen name="confirmar" options={{ presentation: 'modal', title: 'Confirmar pedido' }} />
-      <Stack.Screen name="turno/[numero]" options={{ title: 'Tu turno' }} />
+        {/* Flujo de pedido */}
+        <Stack.Screen name="confirmar" options={{ presentation: 'modal', title: 'Confirmar pedido' }} />
+        <Stack.Screen name="turno/[numero]" options={{ title: 'Tu turno' }} />
 
-      {/* Ayuda y Redirección */}
-      <Stack.Screen name="ayuda/index" options={{ title: 'Ayuda' }} />
-      <Stack.Screen name="ayuda/[...slug]" options={{ title: 'Artículo de ayuda' }} />
-      <Stack.Screen name="pedido" options={{ title: 'Abriendo el carrito' }} />
+        {/* Ayuda y Redirección */}
+        <Stack.Screen name="ayuda/index" options={{ title: 'Ayuda' }} />
+        <Stack.Screen name="ayuda/[...slug]" options={{ title: 'Artículo de ayuda' }} />
+        <Stack.Screen name="pedido" options={{ title: 'Abriendo el carrito' }} />
 
-      {/* Rutas protegidas: cuando el guard es false la pantalla no existe y sale del historial */}
-      <Stack.Protected guard={conSesion}>
-        <Stack.Screen name="cocina" options={{ headerShown: false }} />
-      </Stack.Protected>
+        {/* Rutas protegidas: cuando el guard es false la pantalla no existe y sale del historial */}
+        <Stack.Protected guard={conSesion}>
+          <Stack.Screen name="cocina" options={{ headerShown: false }} />
+        </Stack.Protected>
 
-      <Stack.Protected guard={!conSesion}>
-        <Stack.Screen name="login" options={{ presentation: 'modal', title: 'Iniciar sesión' }} />
-      </Stack.Protected>
+        <Stack.Protected guard={!conSesion}>
+          <Stack.Screen name="login" options={{ presentation: 'modal', title: 'Iniciar sesión' }} />
+        </Stack.Protected>
 
-      {/* Pantalla 404 */}
-      <Stack.Screen name="+not-found" options={{ title: 'Pantalla no encontrada' }} />
-    </Stack>
+        {/* Pantalla 404 */}
+        <Stack.Screen name="+not-found" options={{ title: 'Pantalla no encontrada' }} />
+      </Stack>
+    </>
   );
 }
 

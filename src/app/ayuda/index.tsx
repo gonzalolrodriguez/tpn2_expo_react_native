@@ -34,7 +34,7 @@ const ARTICULOS = [
 
 export default function PantallaAyudaIndex() {
   return (
-    <Pantalla>
+    <Pantalla variante="lectura">
       <Grupo>
         {ARTICULOS.map((art) => (
           <Link key={art.ruta} href={art.ruta} asChild>

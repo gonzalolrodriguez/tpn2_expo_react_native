@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 import { PLATOS } from '../../../data/platos';
+import { Carrusel } from '../../../components/Carrusel';
 import { Chip } from '../../../components/Chip';
 import { DondeEstoy } from '../../../components/DondeEstoy';
-import { Grupo } from '../../../components/Grupo';
 import { Pantalla } from '../../../components/Pantalla';
-import { TarjetaPlato } from '../../../components/TarjetaPlato';
+import { RejillaPlatos } from '../../../components/RejillaPlatos';
 import { espacio, tipo } from '../../../tema/tokens';
 
 const CATEGORIAS = [
@@ -16,39 +16,36 @@ const CATEGORIAS = [
   { id: 'kiosco', nombre: 'Kiosco' },
 ] as const;
 
+// Cada sección sabe cuántas tarjetas tiene antes, para que la entrada escalonada
+// recorra el menú de arriba hacia abajo en lugar de reiniciarse en cada categoría.
+const SECCIONES = CATEGORIAS.map((cat) => ({
+  ...cat,
+  platos: PLATOS.filter((plato) => plato.categoria === cat.id),
+})).map((seccion, indice, todas) => ({
+  ...seccion,
+  indiceInicial: todas.slice(0, indice).reduce((acumulado, anterior) => acumulado + anterior.platos.length, 0),
+}));
+
 export default function PantallaMenu() {
   return (
-    <Pantalla>
+    <Pantalla conBarraCarrito>
       {/* Accesos a cada categoría. La fila se extiende hasta los bordes de la pantalla al desplazar. */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        accessibilityLabel="Categorías del menú"
-        style={styles.categorias}
-        contentContainerStyle={styles.categoriasContenido}
-      >
+      <Carrusel etiqueta="Categorías del menú">
         {CATEGORIAS.map((cat) => (
           <Link key={cat.id} href={`/categorias/${cat.id}`} asChild>
             <Chip titulo={cat.nombre} />
           </Link>
         ))}
-      </ScrollView>
+      </Carrusel>
 
-      {CATEGORIAS.map((cat) => {
-        const platosCat = PLATOS.filter((p) => p.categoria === cat.id);
-        return (
-          <View key={cat.id} style={styles.seccion}>
-            <Text style={tipo.titulo} accessibilityRole="header">
-              {cat.nombre}
-            </Text>
-            <Grupo>
-              {platosCat.map((plato) => (
-                <TarjetaPlato key={plato.id} plato={plato} />
-              ))}
-            </Grupo>
-          </View>
-        );
-      })}
+      {SECCIONES.map((seccion) => (
+        <View key={seccion.id} style={styles.seccion}>
+          <Text style={tipo.titulo} accessibilityRole="header">
+            {seccion.nombre}
+          </Text>
+          <RejillaPlatos platos={seccion.platos} indiceInicial={seccion.indiceInicial} />
+        </View>
+      ))}
 
       <DondeEstoy />
     </Pantalla>
@@ -56,18 +53,9 @@ export default function PantallaMenu() {
 }
 
 const styles = StyleSheet.create({
-  categorias: {
-    // Compensa el relleno de la pantalla para que los chips no se corten antes del borde
-    marginHorizontal: -espacio.lg,
-    flexGrow: 0,
-  },
-  categoriasContenido: {
-    gap: espacio.sm,
-    paddingHorizontal: espacio.lg,
-  },
   seccion: {
-    // Más aire arriba del título que debajo: el título pertenece a su lista
+    // Más aire arriba del título que debajo: el título pertenece a su rejilla
     marginTop: espacio.sm,
-    gap: espacio.sm,
+    gap: espacio.md,
   },
 });

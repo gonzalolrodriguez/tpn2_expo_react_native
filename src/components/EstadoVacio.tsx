@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, espacio, tipo } from '../tema/tokens';
+import { colores, diseno, espacio, tamanioIcono, tipo } from '../tema/tokens';
 
 interface Props {
   icono: keyof typeof Ionicons.glyphMap;
@@ -13,7 +13,7 @@ interface Props {
 
 export const EstadoVacio: React.FC<Props> = ({ icono, titulo, mensaje, children }) => (
   <View style={styles.contenedor}>
-    <Ionicons name={icono} size={40} color={colores.tintaSecundaria} />
+    <Ionicons name={icono} size={tamanioIcono.xl} color={colores.tintaSecundaria} />
     <Text style={[tipo.subtitulo, styles.centrado]}>{titulo}</Text>
     {/* Seleccionable: en los estados de error el mensaje incluye el dato que falló */}
     <Text selectable style={[tipo.cuerpo, styles.mensaje]}>
@@ -37,8 +37,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colores.tintaSecundaria,
   },
+  // Ocupa el ancho en teléfono y queda centrada, sin estirarse, en pantallas anchas
   accion: {
     marginTop: espacio.md,
-    alignSelf: 'stretch',
+    width: '100%',
+    maxWidth: diseno.anchoLectura,
   },
 });
