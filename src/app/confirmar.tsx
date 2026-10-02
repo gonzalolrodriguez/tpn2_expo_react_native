@@ -53,7 +53,7 @@ export default function PantallaConfirmar() {
       </Text>
 
       <View style={styles.acciones}>
-        <Boton titulo="Enviar a la cocina" onPress={handleConfirmar} />
+        <Boton titulo="Confirmar" onPress={handleConfirmar} />
         <Boton variante="texto" titulo="Cancelar" onPress={() => router.back()} />
       </View>
 

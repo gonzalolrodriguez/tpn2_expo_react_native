@@ -111,7 +111,7 @@ Todos los valores visuales salen de `src/tema/tokens.ts`; las pantallas no escri
 
 ## 🔄 Justificación de `replace` vs `push` en el flujo de confirmación
 
-En la pantalla `/confirmar`, al presionar el botón "Enviar a la cocina" (el que confirma el pedido), se utiliza `router.replace('/turno/' + numeroTurno)` en lugar de `router.push()`.
+En la pantalla `/confirmar`, al presionar el botón "Confirmar", se utiliza `router.replace('/turno/' + numeroTurno)` en lugar de `router.push()`.
 
 **Justificación:**  
 Si usáramos `router.push()`, la pantalla de confirmación `/confirmar` se mantendría guardada en la pila del Stack por debajo de la pantalla de turno. Si el usuario presionara el botón de volver "atrás" desde la pantalla de su ticket de turno, reingresaría a la pantalla de confirmación y podría enviar accidentalmente el mismo pedido por segunda vez (duplicando el pedido y colando un segundo turno innecesario).  
