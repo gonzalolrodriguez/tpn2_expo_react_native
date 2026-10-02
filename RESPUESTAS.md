@@ -368,13 +368,13 @@ export default function DetalleProducto() {
 ### D5. Tabs y Drawer en SDK 57
 
 **a) ¿Qué cambió en SDK 57 al importar Tabs? ¿Qué alternativa experimental existe?**
-En el SDK 57 las pestañas se importan desde `expo-router/js-tabs` para la versión en JavaScript. Como alternativa experimental se incluye `expo-router/apple-tabs` para usar componentes de pestañas nativos del sistema.
+En el SDK 57 las pestañas en JavaScript se importan desde `expo-router/js-tabs`; importar `Tabs` directamente desde `expo-router` todavía funciona pero está marcado como obsoleto (_deprecated_). Como alternativa experimental existe `expo-router/unstable-native-tabs`, que usa las pestañas nativas del sistema.
 
 **b) ¿Qué dos paquetes necesita el Drawer y qué componente conviene poner en el layout raíz para los gestos?**
-Necesita los paquetes `@react-navigation/drawer` y `react-native-gesture-handler` (junto con `react-native-reanimated`). En el layout raíz conviene envolver todo con `<GestureHandlerRootView style={{ flex: 1 }}>`.
+Necesita los paquetes `react-native-gesture-handler` y `react-native-reanimated`, instalados con `npx expo install`. En el layout raíz conviene envolver todo con `<GestureHandlerRootView style={{ flex: 1 }}>`.
 
 **c) ¿Hace falta instalar `@react-navigation/drawer` en SDK 57? ¿Por qué?**
-Sí, porque Expo Router se apoya en esa librería por debajo para construir el menú lateral Drawer.
+No. En SDK 57 `expo-router` trae su propio código de navegación incluido en el paquete, así que el Drawer se importa desde `expo-router/drawer` sin instalar ningún paquete `@react-navigation/*`. En este proyecto no figura en `package.json` y el Drawer de `/cocina` funciona igual.
 
 **d) Si hay navegadores anidados, ¿en qué navegador actúa `router.back()`?**
 Actúa sobre el **navegador activo más interno** que contenga pantallas en su pila para desapilar.
@@ -442,8 +442,10 @@ No. Los corchetes en el nombre del archivo solo sirven para partes de la ruta de
 | Hook                     | En `/productos/3`              | En `/buscar?q=chipa` |
 | ------------------------ | ------------------------------ | -------------------- |
 | `usePathname()`          | `"/productos/3"`               | `"/buscar"`          |
-| `useSegments()`          | `["(tabs)", "productos", "3"]` | `["buscar"]`         |
+| `useSegments()`          | `["(tabs)", "productos", "[id]"]` | `["buscar"]`      |
 | `useLocalSearchParams()` | `{ id: "3" }`                  | `{ q: "chipa" }`     |
+
+`useSegments()` devuelve los segmentos tal como están en los archivos, sin reemplazar el parámetro: por eso aparece `"[id]"` y no `"3"`. El valor real se lee con `useLocalSearchParams()`.
 
 ---
 
@@ -476,7 +478,7 @@ Porque si apilara (`push`), la pantalla desde donde se redirige quedaría guarda
 ### F2. Stack.Protected
 
 ```tsx
-src / app / _layout.tsx;
+// src/app/_layout.tsx
 
 function NavegacionRaiz() {
   const { usuario } = useAuth();
@@ -553,5 +555,5 @@ Permite centralizar el control de accesos en el layout principal en lugar de rep
 
 **d) Expo Go dice que el proyecto es incompatible después de instalar un paquete con `npm install`.**
 
-- **Causa:** Se instaló una librería que incluye código fuente nativo no soportado dentro del cliente estándar de Expo Go.
-- **Solución:** Utilizar Expo Prebuild y ejecutar mediante _Development Builds_ (`npx expo run:android` o `npx expo run:ios`).
+- **Causa:** `npm install` trae la última versión publicada del paquete, que puede no ser la que corresponde al SDK del proyecto. Expo Go solo incluye las versiones nativas de un SDK determinado, así que una versión distinta resulta incompatible.
+- **Solución:** Instalar con `npx expo install <paquete>`, que elige la versión compatible con el SDK, y corregir lo ya instalado con `npx expo install --fix` (se verifica con `npx expo install --check`). Si la librería tiene código nativo que Expo Go no incluye, hace falta un _Development Build_.

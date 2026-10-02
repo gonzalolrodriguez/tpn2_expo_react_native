@@ -15,8 +15,9 @@ src/
 ├── app/
 │   ├── _layout.tsx                     -> Stack Raíz (Context, GestureHandlerRootView, Stack.Protected, unstable_settings)
 │   ├── (tabs)/
-│   │   ├── _layout.tsx                 -> Navegador Tabs (Inicio, Menú, Carrito) con Badge de ítems
+│   │   ├── _layout.tsx                 -> Navegador Tabs (Inicio, Menú, Carrito) con Badge de ítems y pestaña Cocina protegida
 │   │   ├── index.tsx                   -> Ruta '/' (Pestaña Inicio: saludo y accesos rápidos)
+│   │   ├── personal.tsx                -> Ruta '/personal' (Pestaña Cocina, solo con sesión: Tabs.Protected)
 │   │   ├── menu/
 │   │   │   ├── _layout.tsx             -> Stack interno de la pestaña Menú
 │   │   │   ├── index.tsx               -> Ruta '/menu' (Lista de platos por categoría)
@@ -43,7 +44,8 @@ src/
 │   └── +not-found.tsx                  -> Pantalla 404 para URLs inexistentes
 ├── components/
 │   ├── DondeEstoy.tsx                  -> Inspector de ruta DEBUG (usePathname, useSegments, useLocalSearchParams)
-│   └── TarjetaPlato.tsx                -> Componente reutilizable para platos
+│   ├── TarjetaPlato.tsx                -> Componente reutilizable para platos
+│   └── TituloConPila.tsx               -> Título de header con el contador de pantallas en la pila (useNavigation().getState())
 ├── context/
 │   └── ComedorContext.tsx              -> Contexto global (sesión, carrito, Pila de deshacer, Cola de pedidos)
 ├── data/
@@ -55,10 +57,26 @@ src/
 
 ### Navegador de cada `_layout`:
 1. `src/app/_layout.tsx`: **Stack Raíz**. Controla la navegación global, envuelve la app con el `ComedorProvider` y `GestureHandlerRootView`, y usa `Stack.Protected` para las rutas `/login` (guard: `!conSesion`) y `/cocina` (guard: `conSesion`).
-2. `src/app/(tabs)/_layout.tsx`: **Tabs**. Muestra la barra de pestañas inferior para **Inicio**, **Menú** y **Carrito** (con `tabBarBadge`).
+2. `src/app/(tabs)/_layout.tsx`: **Tabs** (importadas desde `expo-router/js-tabs`). Muestra la barra de pestañas inferior para **Inicio**, **Menú** y **Carrito** (con `tabBarBadge`). Con sesión iniciada aparece además la pestaña **Cocina**, envuelta en `Tabs.Protected`.
 3. `src/app/(tabs)/menu/_layout.tsx`: **Stack**. Permite navegar de `/menu` a `/menu/[id]` manteniendo visible la barra de pestañas.
 4. `src/app/(tabs)/carrito/_layout.tsx`: **Stack**. Permite desplegar la hoja inferior `/carrito/nota` con `presentation: "formSheet"` y `sheetAllowedDetents: [0.5, 0.9]`.
 5. `src/app/cocina/_layout.tsx`: **Drawer**. Menú lateral desplegable para alternar entre "Pedidos Activos" (`/cocina`) e "Historial Atendidos" (`/cocina/atendidos`).
+
+### Rutas protegidas
+
+`/cocina` y `/login` se declaran dentro de `Stack.Protected` en el layout raíz. Cuando el `guard` es `false` la pantalla no existe:
+
+* **Al iniciar sesión**, el guard de `/login` pasa a `false` y el modal se cierra solo, sin llamar a `router.back()`.
+* **Al cerrar sesión** desde la cocina, el guard de `/cocina` pasa a `false` y toda la sección sale del historial.
+
+Usuario de prueba: `cocina` / `1234`.
+
+### Desafíos opcionales implementados
+
+* **Contador de pila:** el título de los headers del Stack raíz muestra cuántas pantallas hay apiladas (`TituloConPila`).
+* **Tab protegida:** pestaña **Cocina** con `Tabs.Protected`.
+* **Hoja inferior:** `/carrito/nota` con `presentation: "formSheet"` y `sheetAllowedDetents`.
+* **Tiempo estimado:** `/turno/[numero]` multiplica la posición en la cola por 3 minutos.
 
 ---
 
@@ -92,10 +110,11 @@ Gracias a `unstable_settings = { anchor: '(tabs)' }` en el layout raíz, abrir u
 
 ## 🚀 Instrucciones para Iniciar la Aplicación
 
-1. Instalar dependencias con Expo:
+1. Instalar dependencias:
    ```bash
-   npx expo install
+   npm install
    ```
+   Para agregar paquetes nuevos se usa siempre `npx expo install <paquete>`, que elige la versión compatible con el SDK 57. `npx expo install --check` verifica que no haya versiones desalineadas.
 2. Iniciar el servidor de desarrollo:
    ```bash
    npx expo start
@@ -104,3 +123,19 @@ Gracias a `unstable_settings = { anchor: '(tabs)' }` en el layout raíz, abrir u
    ```bash
    npx expo start --web
    ```
+4. Verificar los tipos (incluye las rutas tipadas, que se generan en `.expo/types` al correr `npx expo start`):
+   ```bash
+   npm run typecheck
+   ```
+
+---
+
+## 📸 Capturas
+
+Pendiente: agregar capturas o un video corto de estos flujos.
+
+* Carrito con "Deshacer último"
+* Ticket de turno
+* Cocina atendiendo pedidos
+* Login y logout
+* Pantalla 404

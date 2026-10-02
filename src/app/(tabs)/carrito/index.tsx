@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { useComedor } from '../../../context/ComedorContext';
 import { DondeEstoy } from '../../../components/DondeEstoy';
 
@@ -77,9 +77,12 @@ export default function PantallaCarrito() {
               <Text style={styles.btnLimpiarText}>Vaciar</Text>
             </Pressable>
 
-            <Pressable style={styles.btnConfirmar} onPress={() => router.push('/confirmar')}>
-              <Text style={styles.btnConfirmarText}>Confirmar Pedido ➔</Text>
-            </Pressable>
+            {/* El usuario toca un botón: se navega con <Link>, no con router */}
+            <Link href="/confirmar" asChild>
+              <Pressable style={styles.btnConfirmar}>
+                <Text style={styles.btnConfirmarText}>Confirmar Pedido ➔</Text>
+              </Pressable>
+            </Link>
           </View>
         </>
       )}
